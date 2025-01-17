@@ -117,10 +117,11 @@ else
 
     if [[ "$1" == "ximeraserverDEV" ]]
     then    
+        INTERACTIVE="-it" 
         echo "Starting ximera $SDEVERVER_NAME from $DEVSERVER_IMAGE on port $DEVSERVER_PORT"
         echo "RUNNING " \
-        docker run --rm $INTERACTIVE --mount type=bind,source=$MOUNTDIR,target=/usr/var/server  --name $DEVSERVER_NAME -p $DEVSERVER_PORT:2000 $DEVSERVER_IMAGE
-        docker run --rm $INTERACTIVE --mount type=bind,source=$MOUNTDIR,target=/usr/var/server  --name $DEVSERVER_NAME -p $DEVSERVER_PORT:2000 $DEVSERVER_IMAGE
+        docker run --rm $INTERACTIVE --mount type=bind,source=$MOUNTDIR,target=/usr/var/server  --name $DEVSERVER_NAME -p $DEVSERVER_PORT:2000 --entrypoint /bin/bash $DEVSERVER_IMAGE  
+        docker run --rm $INTERACTIVE --mount type=bind,source=$MOUNTDIR,target=/usr/var/server  --name $DEVSERVER_NAME -p $DEVSERVER_PORT:2000 --entrypoint /bin/bash $DEVSERVER_IMAGE  
         exit
     fi
 
