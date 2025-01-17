@@ -133,5 +133,5 @@ config.lti.secret     = process.env.LTI_SECRET || 'Your Secret';
 module.exports = config;
 
 
-config.brandHomeLink    = process.env.BRAND_HOME_LINK || "https://github.com/XimeraProject";
+config.brandHomeLink    = process.env.BRAND_HOME_LINK || "https://ximera.org";
 config.brandLogo        = process.env.BRAND_LOGO      || "/public/images/logo/logo.svg";
