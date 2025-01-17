@@ -1,11 +1,11 @@
 mixin practiceXourseCardOld(locator, url, card, active)
-  a.activity-card(class=card.cssClass, data-weight=card.weight, href=locator + "/" + url,  data-repository-name=repositoryName, data-path=url, style=style, data-hashes=JSON.stringify(card.hashes))
+  a.activity-card(class=card.cssClass, data-weight=card.weight, href=toValidPath(locator + "/" + url),  data-repository-name=repositoryName, data-path=url, style=style, data-hashes=JSON.stringify(card.hashes))
     div.progress.vertical
       div.progress-bar.progress-bar-success(role="progressbar", style="width: 0%;")
       
 mixin practiceXourseCard(locator, url, card, active)
-  .activity-card.text-center(class=card.cssClass + (active ? " active" : ""),data-weight=card.weight, href=locator + "/" + url, data-repository-name=repositoryName, data-path=url, style=style, data-hashes=JSON.stringify(card.hashes),data-toggle="tooltip",data-placement="bottom",title=card.title ? card.title : 'Practice')
-    a(href=locator + "/" + url)  
+  .activity-card.text-center(class=card.cssClass + (active ? " active" : ""),data-weight=card.weight, href=toValidPath(locator + "/" + url), data-repository-name=repositoryName, data-path=url, style=style, data-hashes=JSON.stringify(card.hashes),data-toggle="tooltip",data-placement="bottom",title=card.title ? card.title : 'Practice')
+    a(href=toValidPath(locator + "/" + url))  
     div.progress.vertical
       div.progress-bar.bg-success(role="progressbar", style="width: 0%;")
 
@@ -15,8 +15,8 @@ mixin titleXourseCard(locator, url, card, active)
       h4.card-title !{card.title}
        
 mixin regularXourseCard(locator, url, card, active)   
-  .activity-card(class=card.cssClass + (active ? " active" : ""),data-weight=card.weight, href=locator + "/" + url, data-repository-name=repositoryName, data-path=url, style=style, data-hashes=JSON.stringify(card.hashes))
-    a(href=locator + "/" + url)  
+  .activity-card(class=card.cssClass + (active ? " active" : ""),data-weight=card.weight, href=toValidPath(locator + "/" + url), data-repository-name=repositoryName, data-path=url, style=style, data-hashes=JSON.stringify(card.hashes))
+    a(href=toValidPath(locator + "/" + url)) 
     div.card-header.p-2
        div.progress
          div.progress-bar.bg-success(role="progressbar", style="width: 0%;")

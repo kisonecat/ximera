@@ -4,7 +4,7 @@ block content
     - var LaTeX = '<span class="other-latex">L<sup>a</sup>T<sub>e</sub>X</span>';
     - var TeX = '<span class="tex">T<sub>e</sub>X</span>';
     #myCarousel.carousel.slide(data-ride='carousel')
-      img.carousel-logo(src=versionPath("/public/images/logo/logo.svg"))
+      img.carousel-logo(src=toValidPath(versionPath("/public/images/logo/logo.svg")))
       ol.carousel-indicators
         li.active(data-target='#myCarousel', data-slide-to='0')
         li(data-target='#myCarousel', data-slide-to='1')
@@ -18,7 +18,7 @@ block content
               h1 Open Courses.  Free Math.
               p You can master mathematics with free interactive mathematics textbooks.
               p
-                a.btn.btn-lg.btn-primary(href="/course/mooculus/calculus1", role='button') 
+                a.btn.btn-lg.btn-primary(href=toValidPath("/course/mooculus/calculus1"), role='button') 
                   i.fa.fa-book
                   | &nbsp;Experience Calculus One
         .carousel-item
@@ -49,6 +49,11 @@ block content
       a.carousel-control-next(href='#myCarousel', role='button', data-slide='next')
         span.carousel-control-next-icon(aria-hidden='true')
         span.sr-only Next
+
+    p.lead
+    h3.center Go directly to the <a href=#{toValidPath("/repositories")}>content</a> published on this Ximera server.
+    p.lead
+
     .container.marketing
       // Three columns of text below the carousel
       .row
@@ -87,39 +92,38 @@ block content
             | Write once.  Share everywhere. 
             span.text-muted One source file for both PDF and HTML.
           p.lead
-            | Write in !{LaTeX} using the <a href="https://github.com/ximeraproject/ximeralatex">Ximera document class</a>.  You can print your document for your own students, or share your document with the world as an online interactive activity.  Authoring in !{LaTeX} combines the power of professional typesetting with modern web technology, all the while retaining the stability of a tried and true language.
+            | Write in !{LaTeX} using the <a href="https://github.com/XimeraProject/ximeraLatex">Ximera document class</a>.  You can print your document for your own students, or share your document with the world as an online interactive activity.  Authoring in !{LaTeX} combines the power of professional typesetting with modern web technology, all the while retaining the stability of a tried and true language.
         .col-md-5
-          img.featurette-image.img-fluid.mx-auto(src=versionPath('/public/images/photos/tablet-and-book.jpg'))
+          img.featurette-image.img-fluid.mx-auto(src=toValidPath(versionPath('/public/images/photos/tablet-and-book.jpg')))
+      //- hr.featurette-divider
+      //- .row.featurette
+      //-   .col-md-7.push-md-5
+      //-     h2.featurette-heading
+      //-       | Join the community. 
+      //-       span.text-muted Ximera makes it easy to collaborate.
+      //-     p.lead
+      //-       | Each year, Ohio State holds a <a href=#{toValidPath("/about/workshop")}>Ximera Workshop</a>.  This workshop is for both novices and experts.  Novices learn how to use Ximera to make their own content, and experts extend the capabilities of the platform.  
+      //-   .col-md-5.pull-md-7
+      //-     img.featurette-image.img-fluid.mx-auto(src=toValidPath(versionPath('/public/images/photos/workshop.jpg')))
+      //- hr.featurette-divider
+      //- .row.featurette
+      //-   .col-md-7
+      //-     h2.featurette-heading
+      //-       | Release v1.0 
+      //-       span.text-muted at the 2018 Joint Mathematics Meetings.
+      //-     p.lead
+      //-       | The Ximera Team announced the v1.0 release of Ximera at a <a href="http://jointmathematicsmeetings.org/meetings/national/jmm2018/2197_program_friday.html#2197:WEBSIGIA">WEB SIGMAA lecture at the 2018 Joint Mathematics Meetings.</a>  The lecture was Friday, January 12, 2018 from 6pm - 6:50pm in San Diego, California.
+      //-   .col-md-5
+      //-     img.featurette-image.img-fluid.mx-auto(src=toValidPath(versionPath('/public/images/photos/san-diego.jpg')))
+      //-     span.small.text-muted <a href="https://commons.wikimedia.org/w/index.php?curid=26089903">Photo</a> by <a href="//commons.wikimedia.org/wiki/User:Bgag" title="User:Bgag">Bernard Gagnon</a> released under <a href="http://creativecommons.org/licenses/by-sa/3.0" title="Creative Commons Attribution-Share Alike 3.0">CC BY-SA 3.0</a>
       hr.featurette-divider
       .row.featurette
         .col-md-7.push-md-5
           h2.featurette-heading
-            | Join the community. 
-            span.text-muted Ximera makes it easy to collaborate.
+            | Find Calculus content on
           p.lead
-            | Each year, Ohio State holds a <a href="/about/workshop">Ximera Workshop</a>.  This workshop is for both novices and experts.  Novices learn how to use Ximera to make their own content, and experts extend the capabilities of the platform.  
+            | <a href="https://ximera.osu.edu//mooculus/calculus1">Calculus 1</a>, <a href="https://ximera.osu.edu/mooculus/calculus2">Calculus 2</a>, and <a href="https://ximera.osu.edu/mooculus/calculus3">Calculus 3</a>.
         .col-md-5.pull-md-7
-          img.featurette-image.img-fluid.mx-auto(src=versionPath('/public/images/photos/workshop.jpg'))
-      hr.featurette-divider
-      .row.featurette
-        .col-md-7
-          h2.featurette-heading
-            | Release v1.0 
-            span.text-muted at the 2018 Joint Mathematics Meetings.
-          p.lead
-            | The Ximera Team announced the v1.0 release of Ximera at a <a href="http://jointmathematicsmeetings.org/meetings/national/jmm2018/2197_program_friday.html#2197:WEBSIGIA">WEB SIGMAA lecture at the 2018 Joint Mathematics Meetings.</a>  The lecture was Friday, January 12, 2018 from 6pm - 6:50pm in San Diego, California.
-        .col-md-5
-          img.featurette-image.img-fluid.mx-auto(src=versionPath('/public/images/photos/san-diego.jpg'))
-          span.small.text-muted <a href="https://commons.wikimedia.org/w/index.php?curid=26089903">Photo</a> by <a href="//commons.wikimedia.org/wiki/User:Bgag" title="User:Bgag">Bernard Gagnon</a> released under <a href="http://creativecommons.org/licenses/by-sa/3.0" title="Creative Commons Attribution-Share Alike 3.0">CC BY-SA 3.0</a>
-      hr.featurette-divider
-      .row.featurette
-        .col-md-7.push-md-5
-          h2.featurette-heading
-            | Calculus content 
-            span.text-muted is available now.
-          p.lead
-            | Explore existing content for <a href="/mooculus/calculus1">Calculus 1</a>, <a href="/mooculus/calculus2">Calculus 2</a>, and <a href="/mooculus/calculus3">Calculus 3</a>.
-        .col-md-5.pull-md-7
-          img.featurette-image.img-fluid.mx-auto(src=versionPath('/public/images/photos/calculus-textbooks.jpg'))
+          img.featurette-image.img-fluid.mx-auto(src=toValidPath(versionPath('/public/images/photos/calculus-textbooks.jpg')))
 
 

@@ -5,10 +5,10 @@ window.MathJax = {
     extensions: ["tex2jax.js","MathMenu.js","MathZoom.js", "toMathML.js", "AssistiveMML.js", "[a11y]/accessibility-menu.js"],
 
     tex2jax: {preview: "none"},
-    
+
     "HTML-CSS": {
-	availableFonts: ["TeX"],
-	imageFont: null
+        availableFonts: ["Tex"],
+        imageFont: null
     },
 	
     processEnvironments: true,
@@ -23,25 +23,19 @@ window.MathJax = {
     // BADBAD: this also breaks the layout triggers
     // showMathMenu: false,
 
-    CommonHTML: {
-	EqnChunk: 10000,
-	EqnChunkFactor: 1,
-	EqnChunkDelay: 0
-    },
-
-    "fast-preview": {disabled: true},
-
     TeX: {
 	equationNumbers: { autoNumber: "AMS" },
-	extensions: ["AMSmath.js","AMSsymbols.js","noErrors.js","noUndefined.js","color.js","cancel.js"],
+	// siunitx copied from  https://github.com/mathjax/MathJax-third-party-extensions/blob/master/legacy/siunitx/siunitx.js
+	extensions: ["AMSmath.js","AMSsymbols.js","noErrors.js","noUndefined.js","color.js","cancel.js","mhchem.js", "siunitx.js" ],
 	noErrors: {disabled: true},
 	Macros: {
+	    SI: ['\\num{#1}\\,\\si{#2}',2],
 	    xspace: '',
 	    ensuremath: ''
 	}
     },
 
-    root: "/node_modules/mathjax/"
+    root: window.toValidPath("/node_modules/mathjax/")
 };
 
 if (window.standalone)

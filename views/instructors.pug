@@ -30,15 +30,18 @@ mixin instructorPanel(instructor)
         span &nbsp;Send E-Mail
       
 block content
+  // Include css files from the repository
+  link(rel="stylesheet",type="text/css",href=toValidPath("/" + repositoryName + "/global.css"))
+  link(rel="stylesheet",type="text/css",href=toValidPath("/" + repositoryName + "/" + xourse.path + ".css"))
   nav(aria-label="breadcrumb",role="navigation")
     ol.breadcrumb
       li.breadcrumb-item
         - var level = 1;
-        a(href="/" + repositoryName, aria-level=level)
+        a(href=toValidPath("/" + repositoryName), aria-level=level)
             | !{repositoryName}
       li.breadcrumb-item
         - level = level + 1;
-        a(href="/" + repositoryName + "/" + xourse.path,aria-level=level)
+        a(href=toValidPath("/" + repositoryName + "/" + xourse.path),aria-level=level)
           if (xourse.title) && (xourse.title != '')
             | !{xourse.title}
           else
@@ -48,7 +51,8 @@ block content
   .container
     div.row
       if instructors.length == 0
-        p I am afraid that I do not know the names of your instructors.  Please email <a href="mailto:ximera-help@osu.edu">ximera-help@osu.edu</a> and we will try to help you find them.
+        p.nl-text Stuur een zo duidelijk mogelijke omschrijving van uw vraag, probleem of opmerking naar het <a href="mailto:zomercursus@set.kuleuven.be">Zomercursus Team</a> en dan zullen we proberen u te helpen.
+        p.en-text Send an email with a clear explanation of your question, problem or comment to the <a href="mailto:zomercursus@set.kuleuven.be">Zomercursus Team</a> and we will try to help you.
       else
         for instructor in instructors
           +instructorPanel(instructor)

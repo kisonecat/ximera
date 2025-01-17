@@ -3,6 +3,23 @@ console.log("    ▀██▄██▀   ██▐██ ▐██   ██▌ �
 console.log("      ███     ██▐██  ██▌ ▐██  ██▌▐█████████ ▄████████▀  ██▀ ▀██");
 console.log("    ▄██▀██▄   ██▐██  ▐██ ██▌  ██▌██        ▐█▌  ▀██▄   ██▀   ▀██");
 console.log("  ▄██▀   ▀██▄ ██▐██   ▀███▀   ██▌▀█████████▐█▌    ▀██▄██▀     ▀██");
+
+var ximera_subpath = localStorage.getItem("ximera-subpath");
+var http = new XMLHttpRequest();
+http.onreadystatechange = function() {
+	var res = http.getResponseHeader('X-Ximera-SubPath');
+	if (res != null) {
+		ximera_subpath = res;
+		localStorage.setItem( "ximera-subpath", ximera_subpath );
+	}
+};
+http.open('HEAD', document.location, false);
+http.send();
+
+window.toValidPath = function (uri) {
+	return ximera_subpath + uri
+}
+
 require('./version');
 
 /* Definitely not ready for a serviceworker
@@ -37,6 +54,8 @@ var tether = require('tether');
 window.Tether = tether;
 var bootstrap = require('bootstrap');
 var kinetic = require('jquery.kinetic/jquery.kinetic.min.js');
+
+require('./chat');
 
 var syntaxHighlighter = require('syntaxhighlighter');
 window.sh = syntaxHighlighter;
@@ -85,8 +104,22 @@ MathJax.Hub.Register.MessageHook("Math Processing Error",function (message) {
 MathJax.Hub.processSectionDelay = 0;
 MathJax.Hub.processUpdateTime = 0;
 
+MathJax.Hub.Register.StartupHook("End", function () {
+	$(".accordion").accordion({
+		active: false,
+		autoHeight: false,
+		collapsible: true,
+		heightStyle: "content"
+	});
+	$(".accordion").removeClass('hidden-out-of-view')
+
+	$("#loadingSpinner").hide() 
+	//$("#theActivity").removeClass('hidden') // Currently, the hidden class is not set
+
+	references.highlightTarget(); // Scroll to target
+ });
+
 MathJax.Hub.Register.StartupHook("TeX Jax Ready",function () {
-    
     // Remove CDATA's from the script tags
     MathJax.InputJax.TeX.prefilterHooks.Add(function (data) {
 	data.math = data.math.replace(/<!\[CDATA\[\s*((.|\n)*)\s*\]\]>/m,"$1");
@@ -316,8 +349,8 @@ MathJax.Hub.Register.StartupHook("TeX Jax Ready",function () {
 	    var keys = this.GetBrackets(name);
 
 	    var input = HTML.Element("form",
-				     {className:"form-inline mathjaxed-input",
-				      style: {width: "155px", marginBottom: "10px", marginTop: "10px", display: "inline-block" },
+				     {className:"mathjaxed-input",
+				      style: {marginBottom: "10px", marginTop: "10px", display: "inline-flex" },
 				     });
 	    input.setAttribute("xmlns","http://www.w3.org/1999/xhtml");
 	    
@@ -334,7 +367,9 @@ MathJax.Hub.Register.StartupHook("TeX Jax Ready",function () {
 		    
 		    options[key] = value;
 		});
-	    }
+		}
+		var showAnswer = options['onlinenoinput'] === '' || options['onlineshowanswerbutton'] === ''
+		var showInput = options['onlinenoinput'] !== ''
 	    	    
 	    var format = options['format'];
 	    var answer;
@@ -354,28 +389,28 @@ MathJax.Hub.Register.StartupHook("TeX Jax Ready",function () {
 		// \answer.
 		answer = this.ParseArg(name);
 	    }
+		input.style.width = (155 + ((showAnswer && showInput) ? 25 : 0)).toString() + "px";
 
-	    // Attempt to change size if we have a short answer
+		// Attempt to change size if we have a short answer
 	    try {
 		answer.parent = {inferRow: false};
 		var correctAnswerMml = answer.toMathML("");	
 		var correctAnswer = Expression.fromMml(correctAnswerMml).toString().toString();
 		if (correctAnswer.length <= 3) {
 		    input.classList.add('narrow'); // to eliminate some padding
-		    input.style.width = "70px";
+			input.style.width = (70 + ((showAnswer && showInput) ? 25 : 0)).toString() + "px";
 		}
 	    } catch (err) {
 	    }
 	    
 	    this.Push(MML.mpadded(MML.mphantom(answer)).With({height: 0, width: 0}));
-
-	    mathAnswer.createMathAnswer( input );
+		mathAnswer.createMathAnswer(input, showInput, showAnswer);
 
 	    var xml = MML.xml(input);
 	    var mml = MML["annotation-xml"](xml).With({encoding:"application/xhtml+xml",isToken:true});
 	    var semantics = MML.semantics(mml);
-	    this.Push(semantics);
-	    this.Push(MML.mpadded().With({height: "30px", width: 0}));
+		this.Push(semantics);
+		this.Push(MML.mpadded().With({height: "30px", width: 0}));
 
 	    return;
 	}
@@ -450,15 +485,18 @@ MathJax.Hub.Configured();
 
 $(document).ready(function() {
     // Make anchors with references from \ref actually work
-    $('a.ximera-label').texLabel();
-    $('a.reference').reference();
-    references.highlightTarget();
+	$('a.ximera-label').texLabel();
+	$('a.reference').reference();
+	
+	// This could go in "init" above, but it needs to be after the end process hook
+	MathJax.Hub.Startup.onload();
     
     // BADBAD: This seems like the wrong thing---why is default here?
     syntaxHighlighter.default.highlight();
 
     rowclick.addClickableTableRows();
 
+    // Scroll to correct item in (old) top card-list
     $('.kinetic').kinetic({});
     var active = $('.activity-card.active');
     if (active.length > 0) {
@@ -466,6 +504,16 @@ $(document).ready(function() {
 	var cardWidth = $('.activity-card.active').width();
 	var windowWidth = $('.kinetic').width();
 	$('.kinetic').scrollLeft( left - windowWidth / 2 + cardWidth / 2 );
+    }
+
+    // Scroll to correct item in (new) nav menu
+    $('.main-toc').kinetic({});
+    var active = $('.activity-card.active');
+    if (active.length > 0) {
+		var top = $('.activity-card.active').position().top;
+		var cardHeight = $('.activity-card.active').height();
+		var windowHeight = $('.main-toc').height();
+		$('.main-toc').scrollTop( top - windowHeight / 2 + cardHeight / 2 );
     }
 
     // This is both mouseup for desktop
@@ -477,34 +525,33 @@ $(document).ready(function() {
 
     // This handles touchscreens; moving less than 100 pixels in less
     // than 500 ms should count as a click
-    var position = 0;
-    var distance = 0;
-    var startTime = 0;
-    $('.activity-card').on( "touchstart", function(e){
-	position = e.originalEvent.touches[0].screenX;
-	distance = 0;
-	startTime = e.originalEvent.timeStamp
-    });
+    // var position = 0;
+    // var distance = 0;
+    // var startTime = 0;
+    // $('.activity-card').on( "touchstart", function(e){
+	// position = e.originalEvent.touches[0].screenX;
+	// distance = 0;
+	// startTime = e.originalEvent.timeStamp
+    // });
     
-    $('.activity-card').on( "touchmove", function(e){
-	var newPosition = e.originalEvent.touches[0].screenX;
-	distance = distance + Math.abs( newPosition - position );
-	position = newPosition;
-    });    
+    // $('.activity-card').on( "touchmove", function(e){
+	// var newPosition = e.originalEvent.touches[0].screenX;
+	// distance = distance + Math.abs( newPosition - position );
+	// position = newPosition;
+    // });    
 
-    $('.activity-card').on( "touchend", function(e){
-	var duration = e.originalEvent.timeStamp - startTime;
-	if ((distance < 100) && (duration < 500)) {
-	    window.location.href = $(this).children('a').attr('href');
-	}
-    });
+    // $('.activity-card').on( "touchend", function(e){
+	// var duration = e.originalEvent.timeStamp - startTime;
+	// if ((distance < 100) && (duration < 500)) {
+	// 	var href = $(this).children('a').attr('href');
+	// 	if(href)
+	//     	window.location.href = href;
+	// }
+    // });
 
     $(".dropdown-toggle").dropdown();
 
     $('[data-toggle="tooltip"]').tooltip();
-
-    // This could go in "init" above, but it needs to be after the end process hook
-    MathJax.Hub.Startup.onload();
 
     $(".activity").activity();
 });

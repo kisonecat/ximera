@@ -28,7 +28,7 @@ exports.update = _.debounce( function() {
     $(".progress.completion-meter").attr('title', 'Submitting grade...' );
     
     $.ajax({
-	url: '/' + xourseUrl + '/gradebook',
+	url: window.toValidPath('/' + xourseUrl + '/gradebook'),
 	type: 'PUT',
 	data: JSON.stringify(payload),
 	contentType: 'application/json',	

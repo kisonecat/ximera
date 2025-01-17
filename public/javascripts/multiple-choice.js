@@ -8,30 +8,30 @@ var Javascript = require('./javascript');
 var buttonTemplate = _.template( '<button class="text-left btn btn-secondary <%= correct %>" id="<%= id %>"></button>' );
 
 var answerHtml = '<div class="btn-group" style="vertical-align: bottom; " aria-live="assertive">' +
-	'<button class="btn btn-success btn-ximera-correct" data-toggle="tooltip" data-placement="top" title="Correct answer!" style="display: none">' +
-	'<i class="fa fa-check"/>&nbsp;Correct' +
+	'<button class="btn btn-success btn-ximera-correct" data-toggle="tooltip" data-placement="top" title="Juiste antwoord!" style="display: none">' +
+	'<i class="fa fa-check"></i>&nbsp;Correct' +
 	'</button></div>' +
 	'<div class="btn-group" style="vertical-align: bottom; " aria-live="assertive">' +
-	'<button class="btn btn-danger btn-ximera-incorrect" data-toggle="tooltip" data-placement="top" title="Incorrect.  Try again!" style="display: none">' +
-	'<i class="fa fa-times"/>&nbsp;Try again' +
+	'<button class="btn btn-danger btn-ximera-incorrect" data-toggle="tooltip" data-placement="top" title="Fout. Probeer opnieuw!" style="display: none">' +
+	'<i class="fa fa-times"></i>&nbsp;Probeer opnieuw' +
 	'</button></div>' +
 	'<div class="btn-group" style="vertical-align: bottom; ">' +
-	'<button class="btn btn-primary btn-ximera-submit" data-toggle="tooltip" data-placement="top" title="Click to check your answer.">' +
-	'<i class="fa fa-question"/>&nbsp;Check work' +
+	'<button class="btn btn-primary btn-ximera-submit btn-ximera-check" data-toggle="tooltip" data-placement="top" title="Klik om je antwoord te controleren.">' +
+	'<i class="fa fa-question"></i><span class="show-check-text">&nbsp;Controleer</span>' +
 	'</button>' +
         '</div>';
 
 var ungradedAnswerHtml = '<div class="btn-group" style="vertical-align: bottom; " aria-live="assertive">' +
-    '<button class="btn btn-success btn-ximera-correct" data-toggle="tooltip" data-placement="top" title="Thank you for your submission" style="display: none">' +
-	'<i class="fa fa-envelope"/>&nbsp;Submitted' +    
+    '<button class="btn btn-success btn-ximera-correct" data-toggle="tooltip" data-placement="top" title="Bedankt voor je inzending" style="display: none">' +
+	'<i class="fa fa-envelope"></i>&nbsp;Verzonden' +    
 	'</button></div>' +
 	'<div class="btn-group" style="vertical-align: bottom; " aria-live="assertive">' +
-	'<button class="btn btn-danger btn-ximera-incorrect" data-toggle="tooltip" data-placement="top" title="Submit again!" style="display: none">' +
-	'<i class="fa fa-times"/>&nbsp;Try again' +
+	'<button class="btn btn-danger btn-ximera-incorrect" data-toggle="tooltip" data-placement="top" title="Verzend opnieuw!" style="display: none">' +
+	'<i class="fa fa-times"></i>&nbsp;Probeer opnieuw' +
 	'</button></div>' +
 	'<div class="btn-group" style="vertical-align: bottom; ">' +
-	'<button class="btn btn-primary btn-ximera-submit" data-toggle="tooltip" data-placement="top" title="Click to submit your answer.">' +
-	'<i class="fa fa-envelope-open"/>&nbsp;Submit your work' +
+	'<button class="btn btn-primary btn-ximera-submit" data-toggle="tooltip" data-placement="top" title="Klik om je antwoord te verzenden.">' +
+	'<i class="fa fa-envelope-open"></i>&nbsp;Verzend' +
 	'</button>' +
         '</div>';
 

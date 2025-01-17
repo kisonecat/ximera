@@ -18,6 +18,6 @@ describe('missing routes', function () {
 	request(app)
 	    .get('/nothing-is-here')
 	    .set('Accept', 'text/html')	
-	    .expect(404, done);
+	    .expect(401, done); // unauthorized now
     });
 });

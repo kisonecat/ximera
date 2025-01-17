@@ -62,6 +62,7 @@ exports.parseActivityBlob = function( repositoryName, filename, blobHash, callba
 function parseXourseDocument( $, filename ) {
     var xourse = { kind: 'xourse' };
     xourse.activityList = [];
+    xourse.activityToc = [];
     xourse.activities = {};
 
     // Read logo
@@ -113,19 +114,40 @@ function parseXourseDocument( $, filename ) {
 	}
 	
 	card.summary = $('h3',this).html();
+	card.datatoclabel = element.attr('data-toc-label');
 	card.cssClass = element.attr('class').replace('activity','');
 
 	// BADBAD: these hashes need to be found, or we need to
 	// replace how we store progress
 	card.hashes = [];
-	card.href = element.attr('href');
+
+	// Ook BADBAD: href is being manipulated in xake
+	//  external links are put in data-xmlink
+	//  202311:THIS BREAKS NEXT/PREVIUOS buttons !!!
+	//
+	// card.href = element.attr('href');
+	if (element.attr('data-xmlink')) {
+		card.href = element.attr('data-xmlink');
+		console.log('GOT XMLINK '+ card.href);
+	}
+	else {
+		card.href = element.attr('href');
+		// console.log('GOT HREF'+ card.href);
+	}
 	if (card.href === undefined) {
 	    card.href = '#' + element.attr('id');
 	}
 
 	
+	// 202309: OBSOLETED ... (but activityList eg used for previous/next buttons)
 	xourse.activities[card.href] = card;
 	xourse.activityList.push( card.href );
+	
+	// activityCards replaces activities and activityList (which do not support duplicate entries)
+	// With numbering-by-TeX, this is annoying ...
+	// see also activity-list.pug
+	xourse.activityToc.push( card );
+
     });
 
     xourse.totalPoints = 0.0;

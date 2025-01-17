@@ -2,33 +2,42 @@ var $ = require('jquery');
 var MathJax = require('./mathjax');
 
 function zoomTo( id ) {
-    var target = $(document.getElementById(id));
-    target = target.closest( 'div, dl' );
+	var target = $(document.getElementById(id));
+	var previousElement = target.prev()
+	if(previousElement.hasClass('caption')){
+		target = previousElement;
+		var previousElement = target.prev();
+		if(previousElement.prop("tagName").toLowerCase() == "img" && previousElement.parent().prop("tagName").toLowerCase() == "div") {
+			target = previousElement.parent();
+		}
+		
+	}
+	else {
+		target = target.closest( 'div, dl' );
+	}
 
     // Make the div flash
     target.addClass("flash");
     window.setTimeout( function(){
         target.removeClass("flash");
     }, 5000);
-
+	
     // This is pretty hacky
     var el = target; 
-    var elOffset = el.offset().top;
-    console.log( "elOffset = " + elOffset );
+    var elOffset = el.offset().top - 90;
     var elHeight = el.outerHeight();
-    var windowHeight = $(window).height();
-    console.log( "windowHeight = " + windowHeight );
+    var windowHeight = $(window).height() - 90;
     var offset;
 
     if (elHeight < windowHeight) {
-	offset = elOffset - ((windowHeight / 2) - (elHeight / 2));
-    }
+		offset = elOffset - ((windowHeight - elHeight) / 2);
+	}
     else {
-	offset = elOffset;
+		offset = elOffset;
     }
 
-    $('html, body').animate({
-	scrollTop: offset
+    $('.main-activity').animate({
+	scrollTop: $('.main-activity').scrollTop() + offset
     }, 1000);
 }
 
@@ -37,28 +46,41 @@ var problemNumber = 1;
 
 var createLabel = function() {
     var label = $(this);
-    var href = label.attr('id');
+	var href = label.attr('id');
+	var referenceText = $('[href="#'+ href + '"').first().text()
 
     function addLabel(reference) {
 	if ( ! (href in MathJax.Extension["TeX/AMSmath"].labels)) {
 	    var tag = undefined;
-	    
-	    var enumerated = label.closest( 'dd.enumerate-enumitem' );
-	    if (enumerated.length > 0) {
-		tag = $.trim( enumerated.prev('dt').text() );
-	    } else {
-		var problem = label.closest('.problem-environment');
-		if (problem.hasClass('problem')) {
-		    tag = problemNumber.toString();
-		    problemNumber = problemNumber + 1;
-		} else {
-		    tag = maximumNumber.toString();
-		    maximumNumber = maximumNumber + 1;
-		}
 
-		problem.attr('numbered', ' ' + tag);		    
-	    }
-	    
+		console.log(href + " " + "#" + referenceText)
+		/*if (href !== "#" + referenceText){
+			tag = referenceText
+		}
+		else{*/
+			var enumerated = label.closest( 'dd.enumerate-enumitem' );
+			if (enumerated.length > 0) {
+			tag = $.trim( enumerated.prev('dt').text() );
+			} else {
+				var previousElement = label.prev();
+				if (previousElement.hasClass("caption")) {
+					tag = referenceText
+				} else {
+					var problem = label.closest('.problem-environment');
+					if (problem.is('[numbered]')){
+						tag = problem.attr('numbered')
+					}
+					else if (problem.hasClass('problem')) {
+						tag = problemNumber.toString();
+						problemNumber = problemNumber + 1;
+					} else {
+						tag = maximumNumber.toString();
+						maximumNumber = maximumNumber + 1;
+					}	   
+				}  
+			}
+		//}
+	    //console.log("Adding " + href + " " + tag)
 	    MathJax.Extension["TeX/AMSmath"].labels[href] = { id: href, tag: tag };
 	}
     }
@@ -77,8 +99,14 @@ var createReference = function() {
 	href = href.replace(/^#/, '' );	
 	if (MathJax.Extension["TeX/AMSmath"].labels[href]) {
 	    var label = MathJax.Extension["TeX/AMSmath"].labels[href];
-	    reference.text( label.tag );
-	    reference.attr('href', '#' + label.id );
+	    if (reference.hasClass('reference-keeptext')) {
+	        console.log(href + " " + "#" + reference.text() + " not replacing");     // debug ...
+		} else {
+			console.log(href + " " + "#" + reference.text() + " replacing by " + label.tag);  //debug ...
+			reference.text(label.tag);
+
+	    }
+	    reference.attr('href', '#' + label.id);
 	    reference.addClass('mathjax-link');
 	}
     }
@@ -108,7 +136,7 @@ var createReference = function() {
 	}
 
 	$.ajax({
-	    url: "/labels/" + repository + "/" + href,
+		url: window.toValidPath("/labels/" + repository + "/" + href),
 	}).done(function(filename) {
 	    // BADBAD: test if I'm on the curent page
 	    if (filename == $("#theActivity").attr('data-path')) {
@@ -117,7 +145,7 @@ var createReference = function() {
 		var xourse = "";
 		if ($("#theActivity").attr('data-xourse-path'))
 		    xourse = "/" + $("#theActivity").attr('data-xourse-path');
-		window.location.href = "/" + repository + xourse + "/" + filename + "#" + href;
+			window.location.href = window.toValidPath("/" + repository + xourse + "/" + filename + "#" + href);
 	    }
 	}).fail( function(xhr, status, err) {
 	    reference.prepend( $('<i class="fa fa-unlink"></i><span>&nbsp;</span>') );
@@ -157,6 +185,7 @@ if (window.location.hash) {
 
 exports.highlightTarget = function() {
     if (targetHash) {
+		console.log(targetHash)
 	window.setTimeout( function() {
 	    zoomTo( targetHash.replace( /^#/, '' ) );
 	}, 1000);

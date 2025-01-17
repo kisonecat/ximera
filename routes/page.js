@@ -90,7 +90,8 @@ exports.activitiesFromRecentCommitsOnMaster = function(req, res, next) {
 exports.parseActivity = function(req,res,next) {
     if (req.activity.hash) {
 	metadata.parseActivityBlob( req.repositoryName, req.activity.path, req.activity.hash, function(err, activity) {
-	    req.activity = _.extend( req.activity, activity );
+		req.activity = _.extend( req.activity, activity );
+		req.activity.html = exports.fixHTML(req.activity);
 	    next();
 	});
     } else {
@@ -98,9 +99,14 @@ exports.parseActivity = function(req,res,next) {
     }
 };
 
-exports.renderWithETag = function(req, res, next) {
-    var activity = req.activity;
+exports.fixHTML = function (activity) {
+	return (activity.html) ? activity.html.replace(/&#x003C;/g, '<')
+						.replace(/&#x003E;/g, '>') : activity.html;
+}
 
+exports.renderWithETag = function(req, res, next) {
+	var activity = req.activity;
+	
     var etag = 'sha:' + activity.hash;
     
     ETag.checkIfNoneMatch( req, res, etag,
@@ -112,7 +118,8 @@ exports.renderWithETag = function(req, res, next) {
 };
 			       
 exports.render = function(req, res, next) {
-    var activity = req.activity;
+	var activity = req.activity;
+	// console.log("Downloads of " + req.activity.path + ": " + JSON.stringify(activity.downloads))
 
     if (activity.kind == 'xourse') {
 	var xourse = activity;
@@ -125,7 +132,6 @@ exports.render = function(req, res, next) {
 	if (xourse.logo) {
 	    logo = url.resolve(config.root, path.join( req.repositoryName, xourse.logo ) );
 	}
-	
 	res.render('xourses/view', { xourse: xourse,
 				     url: req.url,
 				     logo: logo,
@@ -140,8 +146,8 @@ exports.render = function(req, res, next) {
     activity.path = req.activity.path;
     if (activity.path) {
 	activity.path = activity.path.replace(/\.html$/,'')
-    }
-    
+	}
+	
     if (req.activity.xourse) {
 	metadata.parseXourseBlob( req.repositoryName, req.activity.path, req.activity.xourse.hash, function(err,xourse) {
 	    xourse.path = req.activity.xourse.path;
@@ -156,7 +162,7 @@ exports.render = function(req, res, next) {
 	    var nextActivity = null;
 	    var previousActivity = null;
 	    if (activity && (activity.xourse) && (activity.xourse.activityList)) {
-		var list = activity.xourse.activityList.filter( function(s) { return !(s.match(/^#/)); } );
+		var list = activity.xourse.activityList.filter( function(s) { return !(s.match(/^#/) || s.match(/^http/) ); } );
 		var i = list.indexOf( activity.path );
 		if (i >= 0)
 		    nextActivity = list[i+1];
@@ -205,8 +211,7 @@ exports.render = function(req, res, next) {
 			     repositoryName: req.repositoryName,
 			     learner: req.learner,
 			     user: req.user,			     
-			     url: req.url
-			   });
+				 url: req.url });
     }
 };
 
@@ -297,7 +302,6 @@ exports.chooseMostRecentBlob = function(req, res, next) {
 	});
 };
 
-
 exports.serve = function( mimetype ){
     return function(req, res, next) {    
 	var file = req.activities[0];
@@ -314,7 +318,8 @@ exports.serve = function( mimetype ){
 					   res.end( blob, 'binary' );		
 				       })
 				       .catch( function(err) {
-					   next(new Error(err));
+						   res.sendStatus(404)
+					   		//next(new Error(err));
 				       });
 			       });
     };
@@ -365,7 +370,7 @@ exports.mostRecentMetadata = function(req, res, next) {
     var repositoryName = req.params.repository;
     req.repositoryName = req.params.repository;
     
-    repositories.mostRecentMetadataOnBranch( repositoryName, "master" )
+	repositories.mostRecentMetadataOnBranch(repositoryName, "master" )
 	.then( function(metadata) {
 	    req.repositoryMetadata = JSON.parse(metadata);
 	    next();	    
@@ -377,6 +382,17 @@ exports.mostRecentMetadata = function(req, res, next) {
 	    else
 		next(err);
 	});
+};
+
+exports.repositories = function (req, res, next) {
+	repositories.getRepositories().then(repos => {
+		res.render('repositories', { title: 'Home', repos });
+	})
+};
+
+exports.repositoriesRemove = function (req, res, next) {
+	repositories.remove(req.body.repo)
+	next()
 };
 
 exports.labels = function(req, res) {

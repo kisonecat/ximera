@@ -1,12 +1,14 @@
 var $ = require('jquery');
 
 // Check to see if there is a newer version available
-var version = require('../../package.json').version;
+var version = require('../../dbm.json').version;
 console.log("This is XIMERA, Version " + version );
 
 $(function() {
     // Check which version the server is providing, avoiding the cache
-    $.ajax( "/version?" + (new Date().getTime()) )
+	var version_endpoint = window.toValidPath("/version?");
+	// console.log("VERSIONENDPOINT", version_endpoint);
+	$.ajax(version_endpoint + (new Date().getTime()) )
 	.done(function(data) {    
 	    // If the server can offer a newer version, let's update
 	    if (data != version) {

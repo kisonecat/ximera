@@ -1,10 +1,87 @@
 .image-environment {
-    background-color: white;
     text-align: center;
 }
 
-/* BADBAD: maybe this should be controlled with tex4ht somehow */
 .image-environment img {
-    width: 75%;
+    max-width: 60vw;
+    max-height: 60vh;
+    object-fit: contain;
+    -o-object-fit: contain;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+    background: white;
 }
 
+.image-environment img:hover {opacity: 0.7;}
+
+/* The Modal (background) */
+.image-environment-modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 2000; /* Sit on top */
+  padding-top: 100px; /* Location of the box */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgba(0,0,0,0.2); /* Black w/ opacity */
+}
+
+/* Modal Content (Image) */
+.image-environment-modal-content {
+  margin: auto;
+  display: block;
+  width: 80%;
+  max-width: 700px;
+  background: white
+}
+
+/* Caption of Modal Image (Image Text) - Same Width as the Image */
+#image-environment-modal-caption {
+  margin: auto;
+  display: block;
+  width: 80%;
+  max-width: 700px;
+  text-align: center;
+  color: #ccc;
+  padding: 10px 0;
+  height: 150px;
+}
+
+/* Add Animation - Zoom in the Modal */
+.image-environment-modal-content, #image-environment-modal-caption { 
+  animation-name: zoom;
+  animation-duration: 0.6s;
+}
+
+@keyframes zoom {
+  from {transform:scale(0)} 
+  to {transform:scale(1)}
+}
+
+/* The Close Button */
+.image-environment-modal-close {
+  position: absolute;
+  top: 75px;
+  right: 50px;
+  color: #f1f1f1;
+  font-size: 40px;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+.image-environment-modal-close:hover,
+.image-environment-modal-close:focus {
+  color: #bbb;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* 100% Image Width on Smaller Screens */
+@media only screen and (max-width: 700px){
+  .image-environment-modal-content {
+    width: 100%;
+  }
+}

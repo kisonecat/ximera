@@ -1,11 +1,9 @@
 "use strict";
 
 var argv = require('yargs').argv,
-
     gulp       = require('gulp'),
-    gutil      = require('gulp-util'),
     gulpif     = require('gulp-if'),
-    puglint    = require('gulp-pug-lint'),
+    puglinter    = require('gulp-pug-linter'),
     source     = require('vinyl-source-stream'),
     buffer     = require('vinyl-buffer'),
     sourcemaps = require('gulp-sourcemaps'),
@@ -13,8 +11,8 @@ var argv = require('yargs').argv,
     watchify   = require('watchify'),
     aliasify   = require('aliasify'),
     babelify   = require('babelify'),
-    sass       = require('gulp-sass'),
-    minifyCSS  = require('gulp-minify-css'),
+    sass       = require('gulp-sass')(require('sass')),
+    cleanCSS  = require('gulp-clean-css'),
     assign     = require('lodash.assign');
 
 // Directory where static files are found. Don't forget the slash at the end.
@@ -157,14 +155,14 @@ gulp.task('standalone', function() {
 gulp.task('css', function(){
     return gulp.src(cssMainFile)
         .pipe(sass())
-        .pipe(gulpif(argv.production, minifyCSS({keepBreaks:true})))
+        .pipe(gulpif(argv.production, cleanCSS({})))
         .pipe(gulp.dest(staticDirectoryCSS));
 });
 
 gulp.task('css-standalone', function(){
     return gulp.src(cssStandaloneFile)
         .pipe(sass())
-        .pipe(gulpif(argv.production, minifyCSS({keepBreaks:true})))
+        .pipe(gulpif(argv.production, cleanCSS({})))
         .pipe(gulp.dest(staticDirectoryCSS));
 });
 
@@ -174,11 +172,11 @@ gulp.task('css-standalone', function(){
 gulp.task('watchify', function() {
     var watcher  = watchify(bundler);
     return watcher
-	.on('error', gutil.log.bind(gutil, 'Browserify Error'))
-        .on('log', gutil.log) // output build logs to terminal
+	.on('error', console.error)
+        .on('log', console.log) // output build logs to terminal
 	.on('update', function () {
 	    buildPipeline(watcher);
-            gutil.log("Updated JavaScript sources");
+            console.log("Updated JavaScript sources");
     })
     .bundle() // Create the initial bundle when starting the task
     .pipe(source(jsBundleFile))
@@ -196,7 +194,7 @@ gulp.task('service-worker-watch', function () {
 gulp.task('lint', function () {
     return gulp
 	.src('views/**/*.pug')
-	.pipe(puglint());
+	.pipe(puglinter());
 });
 
 gulp.task('watch', gulp.series('watchify', 'csswatch', 'service-worker-watch'));

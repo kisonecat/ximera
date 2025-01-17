@@ -5,6 +5,9 @@
     box-sizing: border-box;    
 }
 
+.topbar-items {
+    display: flex
+}
 
 main.xourse {
   display: flex;
@@ -25,13 +28,15 @@ main.xourse:before {
 }
 
 .card.activity-card .card-number {
-    opacity: 0.5;
-    float: right;
-    font-size: 50%;
+    opacity: 0.6;
+    float: left;
+    font-size: 95%;
+    margin-right: 5px;
+    line-height: 1;
 }
 .card.activity-card .card-number:before {
     content: "§";
-    margin-left: 6px;
+    margin-left: 2px;
 }
 
 // Activity cards are square
@@ -45,7 +50,7 @@ main.xourse:before {
     width: 100%;
     flex: 0 0 100%;
     @for $i from 1 through 28 {
-	@media (min-width: $i * 11rem) {
+	@media (min-width: $i * 22rem) {
 	    width: calc(99.999% / #{$i});
 	    flex: 0 0 calc(99.999% / #{$i});	       
 	}
@@ -53,19 +58,19 @@ main.xourse:before {
     height: 11rem;
 }
 .kinetic .card.activity-card {
-    width: 11rem;
+    width: 22rem;
 }
 
 // The first anchor inside a card covers the whole card, making it
 // clickable.
-.activity-card > a:first-child {
+.activity-card > a:first-of-type {
     z-index: 900;
     position: absolute;
     top: 0; left: 0;
     height: 100%; width: 100%;
 }
 
-.xourse-card > a:first-child {
+.xourse-card > a:first-of-type {
     z-index: 900;
     position: absolute;
     top: 0; left: 0;
@@ -74,7 +79,7 @@ main.xourse:before {
 
 // The section title cards are highlighted
 .card-sectionheading {
-    background-color: $gray-lighter;
+    background-color: darkgray;
     border-color: $gray-lighter;
     h4 {
 	font-weight: bold;
@@ -83,7 +88,12 @@ main.xourse:before {
 
 // The section title cards are highlighted
 .card.chapter {
-    background-color: $gray-lightest;
+    // background-color: $gray-lightest;
+}
+
+.part-open {
+    background-color: $gray-lighter;
+    border-color: darkgray;
 }
 
 // The active card is displayed in an active way
@@ -161,4 +171,3 @@ div.scroll::-webkit-scrollbar-track {
 div.scroll::-webkit-scrollbar-thumb {
     background-color: $gray-dark;
 }
-

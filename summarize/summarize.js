@@ -58,60 +58,73 @@ function mergeEntryIntoSummary(summary, entry) {
     return;
 }
 
-console.log("Summarizing learning recors under " + config.repositories.root);
+function summarize(){
+	console.log("Summarizing learning records");
 
-fs.readdir(config.repositories.root, function(err, items) {
-    async.each( items,
-		function(repositoryName, callback) {
-		    var directory = path.join( config.repositories.root, repositoryName );
-		    var lrsFilename = path.join( directory, 'learning-record-store' );
-		    var summaryFilename = path.join( directory, 'summary.json' );
+	fs.readdir(config.repositories.root, function(err, items) {
+		async.each( items.filter(i => i.endsWith('.git')),
+			function(repositoryName, callback) {
+				var directory = path.join( config.repositories.root, repositoryName );
+				var lrsFilename = path.join( directory, 'learning-record-store' );
+				var summaryFilename = path.join( directory, 'summary.json' );
 
-		    console.log("Working on " + repositoryName);
-		    
-		    async.waterfall([
-			function(callback) {
-			    console.log("...reading previous summary");
-			    fs.readFile(summaryFilename, 'utf8', function (err, data) {
-				if (err)
-				    callback(null, {position: 0});
-				else
-				    callback(null, JSON.parse(data));
-			    });
-			},
-			function(summary, callback) {
-			    console.log("...processing new events");
-			    learningRecordStore.read(
-				lrsFilename, summary.position,
-				function( entry, callback ) {
-				    mergeEntryIntoSummary(summary, entry);
-				    callback(null);
+				console.log("Summarizing " + summaryFilename);
+				
+				async.waterfall([
+				function(callback) {
+					// console.log("...reading previous summary");
+					fs.readFile(summaryFilename, 'utf8', function (err, data) {
+					if (err)
+						callback(null, {position: 0});
+					else
+						try {
+						  callback(null, JSON.parse(data));
+						} catch (e) {
+						  console.error("JSON.parse ", summaryFilename,': ',e.message)
+						  // Move it away for later analysis (only last copy ..)
+						  fs.renameSync(summaryFilename,summaryFilename+'.err')
+						  callback(null, {position: 0});
+						}
+						
+					});
 				},
-				function(err, position) {
-				    if (err) {
-					if (err.code == 'ENOENT')
-					    callback(null, summary);
-					else 
-					    callback(err);
-				    } else {
-					summary.position = position;
-					callback(null, summary);
-				    }
+				function(summary, callback) {
+					// console.log("...processing new events");
+					learningRecordStore.read(
+					lrsFilename, summary.position,
+					function( entry, callback ) {
+						mergeEntryIntoSummary(summary, entry);
+						callback(null);
+					},
+					function(err, position) {
+						if (err) {
+						if (err.code == 'ENOENT')
+							callback(null, summary);
+						else 
+							callback(err);
+						} else {
+						summary.position = position;
+						callback(null, summary);
+						}
+					});
+				},
+				function(summary, callback) {
+					//console.log("...saving new summary");
+					fs.writeFile(summaryFilename, JSON.stringify(summary), callback );
+				}
+				], function (err) {
+				callback(err);
 				});
 			},
-			function(summary, callback) {
-			    console.log("...saving new summary");
-			    fs.writeFile(summaryFilename, JSON.stringify(summary), callback );
-			}
-		    ], function (err) {
-			callback(err);
-		    });
-		},
-		function(err) {
-		    if (err) {
-			console.log(err);
-		    } else {
-			console.log("Finished with all summaries.");
-		    }
-		});
-});
+			function(err) {
+				if (err) {
+				console.log(err);
+				} else {
+				// console.log("Finished with all summaries.");
+				}
+			});
+	});
+}
+
+summarize() // Run on startup
+setInterval(summarize, 1000 * 60 * 15) // Every 15 minutes

@@ -5,6 +5,7 @@
  */
 
 var pkg               = require('./package.json');
+var dbm               = require('./dbm.json')
 var dotenv            = require('dotenv');  // https://www.npmjs.com/package/dotenv
 var path              = require('path');
 
@@ -29,15 +30,20 @@ var config            = {};
 
 // From package.json
 config.name           = pkg.name;
-config.version        = pkg.version;
+config.version        = dbm.version;
 config.description    = pkg.description;
 config.company        = pkg.company;
 config.author         = pkg.author;
 config.keywords       = pkg.keywords;
-config.environment    = process.env.NODE_ENV || 'development';
+//config.environment    = process.env.NODE_ENV || 'development';
+config.environment    = process.env.NODE_ENV || 'test';
 
 config.port = process.env.PORT || 3000;
-config.root = process.env.ROOT_URL || ('http://localhost:' + config.port);
+config.subPath = process.env.SUB_PATH || ''
+config.root = (process.env.ROOT_URL || ('http://localhost:' + config.port)) + config.subPath;
+config.toValidPath = function (url) {
+    return `${config.subPath}${url}`
+};
 
 config.logging = false;
 
@@ -55,6 +61,13 @@ config.repositories.root = process.env.GIT_REPOSITORIES_ROOT || (path.join(__dir
 config.mongodb          = {};
 config.mongodb.url      = process.env.XIMERA_MONGO_URL || '127.0.0.1';
 config.mongodb.database = process.env.XIMERA_MONGO_DATABASE || 'ximera';
+
+/**
+ * Redis Configuration
+ */
+config.redis = {};
+config.redis.url = process.env.XIMERA_REDIS_URL || '127.0.0.1'
+config.redis.port = process.env.XIMERA_REDIS_PORT || 6379;
 
 /**
  * Session Configuration
@@ -100,13 +113,13 @@ config.github.clientID         = process.env.GITHUB_CLIENT_ID    || 'Your Key';
 config.github.clientSecret     = process.env.GITHUB_CLIENT_SECRET || 'Your Secret';
 
 // Twitter
-config.twitterAuth             = true;
+config.twitterAuth             = false;
 config.twitter                 = {};
 config.twitter.consumerKey     = process.env.TWITTER_CONSUMER_KEY    || 'Your Key';
 config.twitter.consumerSecret  = process.env.TWITTER_CONSUMER_SECRET || 'Your Secret';
 
 // Google
-config.googleAuth              = true;
+config.googleAuth              = false;
 config.google                  = {};
 config.google.clientID         = process.env.GOOGLE_CLIENT_ID    || 'Your Key';
 config.google.clientSecret     = process.env.GOOGLE_CLIENT_SECRET || 'Your Secret';
@@ -118,3 +131,7 @@ config.lti.key        = process.env.LTI_KEY    || 'Your Key';
 config.lti.secret     = process.env.LTI_SECRET || 'Your Secret';
 
 module.exports = config;
+
+
+config.brandHomeLink    = process.env.BRAND_HOME_LINK || "https://github.com/XimeraProject";
+config.brandLogo        = process.env.BRAND_LOGO      || "/public/images/logo/logo.svg";

@@ -2,13 +2,20 @@
   .modal-dialog(role="document")
     .modal-content
       .modal-header
-        h5.modal-title Warning
+        h5.modal-title 
+          span.nl-text Waarschuwing
+          span.en-text Warning
         button.close(type="button",data-dismiss="modal",aria-label="Close")
           span(aria-hidden="true") &times;
       .modal-body
-        p You are about to <strong>erase your work</strong> on this activity.  Are you sure you want to do this?        
+        p.nl-text Je bent je <strong>ingevulde velden</strong> bij deze pagina aan het verwijderen. Ben je zeker dat je dit wilt doen?        
+        p.en-text You are erasing your <strong>filled-in fields</strong> on this page. Are you sure that is what you want?        
       .modal-footer
           button.btn.btn-primary(type="button",data-dismiss="modal") 
-            | <i class="fa fa-life-ring"></i>&nbsp;No, keep my work.
+            | <i class="fa fa-life-ring"></i>&nbsp;
+            span.nl-text Nee, behoud mijn werk.
+            span.en-text No, keep my work.
           button.btn.btn-danger#reset-work-button(type="button", data-dismiss="modal")
-            | <i class="fa fa-eraser"></i>&nbsp;Yes, delete my work.
+            | <i class="fa fa-eraser"></i>&nbsp;
+            span.nl-text Ja, verwijder mijn werk.
+            span.en-text Yes, erase my work.

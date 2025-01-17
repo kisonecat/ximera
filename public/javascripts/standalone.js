@@ -315,7 +315,7 @@ MathJax.Hub.Register.StartupHook("TeX Jax Ready",function () {
 	    
 	    this.Push(MML.mpadded(MML.mphantom(answer)).With({height: 0, width: 0}));
 	    
-	    mathAnswer.createMathAnswer( input );
+		mathAnswer.createMathAnswer(input, options['onlinenoinput'] !== '', options['onlinenoinput'] === '' || options['onlineshowanswerbutton'] === '');
 
 	    var xml = MML.xml(input);
 	    var mml = MML["annotation-xml"](xml).With({encoding:"application/xhtml+xml",isToken:true});

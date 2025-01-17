@@ -1,4 +1,12 @@
 if activity && activity.path && repositoryMetadata && repositoryMetadata.github
   button.btn.btn-default.mx-1(role="button",onclick=`location.href = \"https://github.com/${repositoryMetadata.github.owner}/${repositoryMetadata.github.repository}/edit/master/${activity.path}.tex\";`)
     | <i class="fa fa-pencil"></i>
-    span.hidden-md-down &nbsp;Edit
+    span.hidden-md-down &nbsp;Wijzig
+//-if activity && activity.path && repositoryMetadata && repositoryMetadata.gitlab
+//-  button.btn.btn-default.mx-1(role="button",onclick=`location.href = \"https://gitlab.kuleuven.be.com/${repositoryMetadata.gitlab.owner}/${repositoryMetadata.gitlab.repository}/edit/master/${activity.path}.tex\";`)
+//-    | <i class="fa fa-pencil"></i>
+//-    span.hidden-md-down &nbsp;Wijzig
+if activity && activity.path && repositoryMetadata 
+  button.btn.btn-default.mx-1(role="button",onclick=`location.href = \"https://gitlab.kuleuven.be/monitoraat-wet/zomercursus-wiskunde/edit/master/${activity.path}.tex\";`)
+    | <i class="fa fa-pencil"></i>
+    span.hidden-md-down &nbsp;Wijzig

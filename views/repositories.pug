@@ -1,0 +1,31 @@
+extends layouts/main
+
+block title
+  | Repositories
+  
+block content
+
+  | Following repositories are published on this server:
+
+  table.table
+    thead
+      tr
+        th Name
+        th Action
+        th Last commit
+        th Last committer 
+    tbody
+    for repo in repos  
+      if repo.name
+       
+        tr
+          th(scope="row")
+            a(href=toValidPath(`/${repo.name}`)) #{repo.name}        
+          td
+            if repo.deleteable
+              form(method="POST")
+                input(type="hidden",name="repo",value=repo.name)
+                input(type="submit",value="VERWIJDER")
+          td #{repo.lastCommitDate}
+          td #{repo.lastCommitInfo}
+

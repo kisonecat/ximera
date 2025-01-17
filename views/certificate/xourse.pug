@@ -20,12 +20,12 @@ block content
             dd &nbsp;
           else
             dt.page
-              a(href=activityUrl) !{activity.title}
+              a(href=toValidPath(activityUrl)) !{activity.title}
             dd #{percent(activity.completion)}
         hr
         dt.total Overall
         dd #{score.toString() + '%'}
 
-      p
-        a(href=`/certificate/${escapedCode}/${escapedSignature}`)
-          span.certificate https://ximera.osu.edu/certificate/#{escapedCode}/#{escapedSignature}
+      //- p
+      //-   a(href=`/certificate/${escapedCode}/${escapedSignature}`)
+      //-     span.certificate https://ximera.osu.edu/certificate/#{escapedCode}/#{escapedSignature}

@@ -4,38 +4,6 @@ var MathJax = require('mathjax');
 var database = require('./database');
 var TinCan = require('./tincan');
 
-var buttonTemplate = _.template( '<label class="btn btn-default <%= correct %>" id="<%= id %>"></label>' );
-
-var oldtemplate = '<form class="form-inline" style="display: inline-block;">' +
-	'<span class="input-group">' +
-   	'<select class="form-control">' +
-	'<option class="blank"></option>' +
-	'</select>' +
-	'<span class="input-group-btn">' +
-	'<button class="btn btn-success btn-ximera-correct" data-toggle="tooltip" data-placement="top" title="Correct answer!" style="display: none">' +
-	'<i class="fa fa-fw fa-check"/>' +
-	'</button>' +
-	'<button class="btn btn-danger btn-ximera-incorrect" data-toggle="tooltip" data-placement="top" title="Incorrect.  Try again!" style="display: none">' +
-	'<i class="fa fa-fw fa-times"/>' +
-	'</button>' +
-	'<button class="btn btn-primary btn-ximera-submit" data-toggle="tooltip" data-placement="top" title="Click to check your answer.">' +
-	'<i class="fa fa-fw fa-question"/>' +
-	'</button>' +
-	'</span>' +
-	'</span>' +
-    '</form>';
-
-var template = '<div class="dropdown word-choice">' +
-    '<button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' +
-    'Dropdown button' +
-    '</button>' +
-    '<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">' +
-    '<a class="dropdown-item" href="#">Action</a>' +
-    '<a class="dropdown-item" href="#">Another action</a>' +
-    '<a class="dropdown-item" href="#">Something else here</a>' +
-    '</div>' +
-    '</div>';
-
 var createWordChoice = function() {
     var wordChoice = $(this);
     

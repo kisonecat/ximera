@@ -54,7 +54,7 @@ exports.displayPopover = function(answer, element) {
 	}
 	
 	if ((format == 'integer') && (answer.trim().match( /[^0-9-]/ ))) {
-	    throw 'Expecting an integer.';
+	    throw 'Verwacht een geheel getal.';
 	}
 
 	// Don't need to give a preview for numeric answers

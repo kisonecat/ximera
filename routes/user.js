@@ -10,6 +10,7 @@ var validator = require('validator');
 var moment = require('moment');
 var async = require('async');
 var mdb = require('../mdb');
+var config = require('../config');   // for toValidPath ...
 var githubApi = require('github');
 
 function hasPermissionToView( viewer, viewee ) {
@@ -45,7 +46,7 @@ function hasPermissionToEdit( viewer, viewee ) {
 
 exports.getCurrent = function(req, res, next){
     if (req.accepts('html')) {
-	res.redirect(302, '/users/' + req.user._id );
+	res.redirect(302, config.toValidPath('/users/' + req.user._id) );
 	return;
     }
     
@@ -357,6 +358,7 @@ exports.edit = function(req, res, next){
 			
 			res.format({
 			    html: function(){
+				console.log('Edit user document for: '+req.params.id);
 				console.log(document);
 				res.render('user/edit', { userId: req.params.id,
 							  user: req.user,
@@ -502,8 +504,8 @@ exports.update = function(req, res, next){
 
 exports.index = function(req, res, next) {
     var page = req.params.page;
-    var pageSize = 10;
-    var pageCount = 1;
+    var pageSize = 100;
+    var pageCount = 5;
 
     if (!(('user' in req) && (req.user.superuser))) {
 	res.status(403);

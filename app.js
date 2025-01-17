@@ -42,8 +42,14 @@ var express = require('express')
   , sendSeekable = require('send-seekable')
   , url = require('url')
   , versionator = require('versionator')
-  , WebSocketServer = require("ws").Server 
+  , WebSocketServer = require("ws").Server
+  , basicAuth = require('express-basic-auth')
   ;
+
+require('./summarize/summarize') // Load summarize interval
+
+// add timestamps in front of log messages
+require('console-stamp')(console, 'yyyymmdd HH:MM:ss]');
 
 // Some filters for Pug; admittedly, Pug comes with its own Markdown
 // filter, but I want to run everything through a filter to add
@@ -52,7 +58,7 @@ var pug = require('pug');
 var md = require("markdown");
 pug.filters.ximera = function(str){
     return str
-	.replace(/Ximera/g, '<a class="ximera" href="/">Ximera</a>')
+	.replace(/Ximera/g, `<a class="ximera" href=${config.toValidPath('/')}>Ximera</a>`)
 	.replace(/---/g, '&mdash;')
 	.replace(/--/g, '&ndash;')
     ;
@@ -75,12 +81,14 @@ app.set('view engine', 'pug');
 // all environments
 app.set('port', config.port);
 
-app.use(logger('dev'));
+// app.use(logger('combined'));
+app.use(logger('ACC :remote-addr - :remote-user [:date[iso]] ":method :url HTTP/:http-version" :status :res[content-length] :req[x-forwarded-for]'));
 app.use(favicon(path.join(__dirname, 'public/images/icons/favicon/favicon.ico')));
 
 app.use(function(req, res, next) {
     res.locals.path = req.path;
     res.locals.absoluteUrl = url.resolve(config.root, req.url);
+    res.header('X-Ximera-SubPath', config.subPath);
     next();
 });
 
@@ -91,6 +99,9 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(methodOverride());
 
 app.use(cookieParser(config.session.secret));
+
+app.enable('trust proxy')
+app.set('trust proxy',1)
 
 // Common mongodb initializer for the app server and the activity service
 mdb.initialize(function (err) {
@@ -110,7 +121,9 @@ mdb.initialize(function (err) {
 	resave: false,
 	saveUninitialized: false,
 	store: new MongoStore({ mongooseConnection: mdb.mongoose.connection }),
-	cookie: { maxAge: year }
+	cookie: { maxAge: year,
+              secure: true,
+              sameSite: 'none' }
     });
     
     app.use(theSession);
@@ -141,7 +154,7 @@ mdb.initialize(function (err) {
     }
     
 passport.use(login.localStrategy(config.root));
-passport.use(login.googleStrategy(config.root));
+//passport.use(login.googleStrategy(config.root));
 passport.use(login.twitterStrategy(config.root));
 passport.use('lms', login.lmsStrategy(config.root));    
 passport.use(login.githubStrategy(config.root));
@@ -157,7 +170,7 @@ passport.deserializeUser(function(id, done) {
    });
 });
 
-    app.version = require('./package.json').version;
+    app.version = config.version;
     
     function redirectMasqueradesAsSelf( req, res, next ) {
 	if (req.params.masqueradingUserId) {
@@ -170,18 +183,28 @@ passport.deserializeUser(function(id, done) {
 	}
 	next();
     }
+
+    function private(req, res, next){
+        basicAuth({
+            users: { 'private': 'nietzichtbaar' },
+            challenge: true
+        })(req, res, next)
+    }
     
     function redirectUnnormalizeRepositoryName( req, res, next ) {
-	if (req.params.repository) {
-	    var normalized = req.params.repository.replace( /[^0-9A-Za-z-]/, '' ).toLowerCase();
-	    if (req.params.repository != normalized) {
-		var splitted = req.url.split('/');
-		splitted[1] = normalized;
-		res.redirect(301, splitted.join('/'));
-		return;
-	    }
-	}
-	next();
+        if (req.params.repository) {
+            var normalized = req.params.repository.replace( /[^0-9A-Za-z-\*]/, '' ).toLowerCase();
+            if (req.params.repository != normalized) {
+            var splitted = req.url.split('/');
+            splitted[1] = normalized;
+            res.redirect(301, splitted.join('/'));
+            return;
+            }
+        }
+        // if(req.params.repository.indexOf('*') !== -1)
+        //     private(req,res,next)
+        // else
+        next()
     }	
     
     ////////////////////////////////////////////////////////////////
@@ -235,6 +258,9 @@ passport.deserializeUser(function(id, done) {
 	}
 	return url;	
     };
+
+    app.locals.toValidPath = config.toValidPath
+
     app.use('/public', versionator.middleware);
     app.use('/public', express.static(path.join(__dirname, 'public'), {maxAge: '1y'}));;
     app.use('/lib/guppy', express.static(path.join(__dirname, 'node_modules/guppy-dev/lib'), {maxAge: '1y'}));
@@ -308,6 +334,18 @@ passport.deserializeUser(function(id, done) {
 	res.set( 'location', '/' + req.params.path );
 	res.status(301).send();
     });    
+    // BADBAD: hard redirect zomercursus naar blik-op-wiskunde voor sommige xourses 
+    app.get( '/zomercursus/zomercursusWisFys', function( req, res ) { res.redirect(config.toValidPath('/blik-op-wiskunde/zomercursusWisFys')); });
+    app.get( '/zomercursus/handboekB', function( req, res ) { res.redirect(config.toValidPath('/blik-op-wiskunde/handboekB')); });
+    app.get( '/zomercursus/handboekB/:path(*)', function( req, res ) { 
+        res.set( 'location', config.toValidPath('/blik-op-wiskunde/handboekB/') + req.params.path );
+        res.status(301).send();
+        });
+    app.get( '/zomercursus/zomercursusWisFys/:path(*)', function( req, res ) { 
+        res.set( 'location', config.toValidPath('/blik-op-wiskunde/zomercursusWisFys/') + req.params.path );
+        res.status(301).send();
+        });
+    
     
     app.get( '/certificate/:certificate/:signature', certificate.view );
 
@@ -328,10 +366,11 @@ passport.deserializeUser(function(id, done) {
     // Logins
 
     // Google login.
-    app.get('/auth/google', passport.authenticate('google-openidconnect'));
+    /*app.get('/auth/google', passport.authenticate('google-openidconnect'));
     app.get('/auth/google/callback',
-            passport.authenticate('google-openidconnect', { successRedirect: '/just-logged-in',
-							    failureRedirect: '/auth/google'}));
+        passport.authenticate('google-openidconnect', {
+            successRedirect: config.toValidPath('/just-logged-in'),
+							    failureRedirect: '/auth/google'}));*/
 
     if (config.localAuth) {
 	app.post('/auth/local', 
@@ -345,7 +384,8 @@ passport.deserializeUser(function(id, done) {
     if (config.twitterAuth) {
 	app.get('/auth/twitter', passport.authenticate('twitter'));
 	app.get('/auth/twitter/callback',
-		passport.authenticate('twitter', { successRedirect: '/just-logged-in',
+        passport.authenticate('twitter', {
+            successRedirect: config.toValidPath('/just-logged-in'),
 						   failureRedirect: '/auth/twitter'}));
     }
 
@@ -353,17 +393,20 @@ passport.deserializeUser(function(id, done) {
     if (config.githubAuth) {
 	app.get('/auth/github', passport.authenticate('oauth2'));
 	app.get('/auth/github/callback',
-		passport.authenticate('oauth2', { successRedirect: '/just-logged-in',
+        passport.authenticate('oauth2', {
+            successRedirect: config.toValidPath('/just-logged-in'),
 						  failureRedirect: '/',
 						  failureFlash: true}));
     }
 
     // LTI login
     if (config.ltiAuth) {
-	app.post('/lms', passport.authenticate('lms', { successRedirect: '/just-logged-in',
+        app.post('/lms', passport.authenticate('lms', {
+            successRedirect: config.toValidPath('/just-logged-in'),
 							failureRedirect: '/',
 							failureFlash: true}));
-	app.post('/:repository/:path(*)/lti', passport.authenticate('lms', { successRedirect: '/just-logged-in',
+        app.post('/:repository/:path(*)/lti', passport.authenticate('lms', {
+            successRedirect: config.toValidPath('/just-logged-in'),
 									     failureRedirect: '/',
 									     failureFlash: true}));	
     }
@@ -375,15 +418,15 @@ passport.deserializeUser(function(id, done) {
 
     app.get('/just-logged-in', function (req, res) {
         if (req.user.course) {
-	    console.log( "course = ", req.user.course);
-	    res.redirect( req.user.course );
-	} else {
-	    if (req.user.lastUrlVisited && (req.user.lastUrlVisited != "/") && (!(req.user.lastUrlVisited.match(/\.svg$/)))) {
-		console.log( "lastUrlVisited = ", req.user.lastUrlVisited);
-		res.redirect(req.user.lastUrlVisited);
-	    } else
-		res.redirect('/');
-	}
+	        console.log( "course = ", req.user.course);
+            res.redirect(config.toValidPath(req.user.course));
+	    } else {
+            if (req.user.lastUrlVisited && (req.user.lastUrlVisited != "/") && (!(req.user.lastUrlVisited.match(/\.svg$/)))) {
+                console.log( "lastUrlVisited = ", req.user.lastUrlVisited);
+                res.redirect(config.toValidPath(req.user.lastUrlVisited));
+            } else
+                res.redirect(config.toValidPath('/'));
+        }
     });
     
     ////////////////////////////////////////////////////////////////
@@ -418,9 +461,11 @@ passport.deserializeUser(function(id, done) {
 
     serveContent( '*.svg', page.serve('image/svg+xml') );
     serveContent( '*.png', page.serve('image/png') );
-    serveContent( '*.pdf', page.serve('image/pdf') );
+    serveContent( '*.pdf', page.serve('application/pdf') );
     serveContent( '*.jpg', page.serve('image/jpeg') );
+    serveContent( '*.gif', page.serve('image/gif') );
     serveContent( '*.js',  page.serve('text/javascript') );
+    serveContent('*.css', page.serve('text/css'));
 
     app.get( '/:repository/:path(*.tex)',
 	     redirectUnnormalizeRepositoryName,
@@ -451,26 +496,27 @@ passport.deserializeUser(function(id, done) {
     // State storage    
     
     var state = require('./routes/state.js');
-
-    app.get( '/completions',
-             state.getCompletions );
-    app.put( '/completions/:repository/:path(*)',
-	     repositories.normalizeName,
-             state.putCompletion );
-    app.get( '/commits/:repository/:path(*)',
-	     repositories.normalizeName,
-             state.getCommit );
-
-    app.get( '/state/:activityHash/:uuid',
-	     repositories.normalizeName,
-             state.getState );
     
-    app.patch( '/state/:activityHash/:uuid',
-	       repositories.normalizeName,
-               state.patchState );
-             
-    ////////////////////////////////////////////////////////////////
-    // Gradebook    
+    state.wss = wss;
+    
+    wss.on("connection", function (ws, req) {
+	cookieParser(config.session.secret)(req, null, function(err) {
+	    if (err) {
+		winston.error(err);
+		return;
+	    }
+	    
+	    theSession(req, {}, function(err, session) {
+		if (err) {
+		    winston.error(err);
+		    return;		    
+		} else {
+		    ws.session = req.session;
+		    state.connection(ws);
+		}
+	    });
+	});
+    });
     
     app.get( '/:repository/:path(*)/gradebook',
 	     repositories.normalizeName,
@@ -510,19 +556,30 @@ passport.deserializeUser(function(id, done) {
 	     page.activitiesFromRecentCommitsOnMaster,
 	     page.chooseMostRecentBlob,
 	     parallel([page.fetchMetadataFromActivity,
-		       page.parseActivity]),
-	     page.renderWithETag );
+                    page.parseActivity]),
+         page.renderWithETag);
     
+    app.get('/repositories', 
+        // private, 
+        page.repositories)
+
+    app.post('/repositories', 
+        private, 
+        page.repositoriesRemove, 
+        page.repositories)
+
     app.get( '/:repository',
+        //  private,
 	     redirectUnnormalizeRepositoryName,	     	     
 	     page.mostRecentMetadata,
-	     xourses.index );
+         xourses.index );        
+    
     
     if(!module.parent){
         server.listen(app.get('port'), function(stream){
 	    console.log('Express server listening on port ' + app.get('port'));
         });		    
-    }
+    }    
         
     // If nothing else matches, it is a 404
     app.use(function(req, res, next){

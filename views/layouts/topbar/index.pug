@@ -1,0 +1,110 @@
+if ( activity.downloads_xourse && activity.downloads_xourse.length > 0 ) || (activity.downloads && activity.downloads.length > 0 )
+    div.xmdownload
+      i.fa.fa-file-pdf-o
+      span.xmhidden-small.hidden-md-down &nbsp;Download&thinsp; 
+      i.fa.fa-caret-down.fa-2xs
+      ul.xmdownload-inhoud
+        if activity.downloads_xourse && activity.downloads_xourse.length > 0
+          for download in activity.downloads_xourse
+            li.xmlnk:  a(href=download.url, target="_blank")
+              i.fa.fa-file-pdf-o &nbsp;
+              span.complete-course-text-download-label Volledige cursus 
+              if download.label == "standaard_pdf"
+                span.complete-course-text-download-text (met antwoorden)
+              else if download.label == "handout_pdf"
+                span.complete-course-text-download-text (zonder antwoorden)
+              else
+                span.complete-course-text-download-text (#{download.label})
+        if activity.downloads && activity.downloads.length > 0
+          for download in activity.downloads
+            li.xmlnk:  a(href=download.url, target="_blank")
+              i.fa.fa-file-pdf-o &nbsp;
+              span.chapter-course-text-download-label Deze pagina "#{activity.title}"&nbsp;
+              if download.label == "standaard_pdf"
+                span.complete-course-text-download-text (met antwoorden)
+              else if download.label == "handout_pdf"
+                span.complete-course-text-download-text (zonder antwoorden)
+              else
+                span.complete-course-text-download-text (#{download.label})
+include due-date        
+include statistics
+button.btn.btn-info#math-edit-button(role="button",style="display: none;")
+    i.fa.fa-magic
+    span.hidden-md-down &nbsp;Wiskunde Editor
+span.xmupdate: a.btn-warning.pulsate#pageUpdate(type="button",data-toggle="modal", data-target="#updateWarningModal", style="display: none;")
+           | <i class="fa fa-level-up"></i>
+           span.xmhidden-small &nbsp;
+           span.update-label Update
+           span.update-text    
+//- span.xmerase: a(role="button", data-toggle="modal", data-target="#resetWarningModal")
+           i.fa.fa-eraser
+div.xmsettings
+  i.fa.fa-bars
+  span.xmhidden-small.hidden-md-down &nbsp;Settings&thinsp; 
+  i.fa.fa-caret-down.fa-2xs
+  ul.xmsettings-inhoud
+    if activity
+      li.xmhideprogress(role="button")
+        span.xmprogresshidden#xmprogess-close
+          i.fa.fa-eye-slash
+          span.xmhidden-small &nbsp;Verberg vooruitgang
+        span#xmprogess-open
+          i.fa.fa-eye
+          span.xmhidden-small &nbsp;Toon vooruitgang
+      li.xmerase(role="button", data-toggle="modal", data-target="#resetWarningModal")
+           i.fa.fa-eraser
+           span.xmhidden-small &nbsp; Verwijder je antwoorden (op deze pagina)
+           span.xmhidden
+           //-  span.erase-explanation-label Verwijder al je pogingen op deze pagina
+           //-  span.erase-explanation-text
+      //- NO more wijzig button for now ....                                                                                                            
+      if false && activity && activity.path && repositoryMetadata                                                                                                        
+        li.xmwijzig: a(role="button",onclick=`location.href = \"https://gitlab.kuleuven.be/monitoraat-wet/zomercursus-wiskunde/edit/master/${activity.path}.tex\";`)
+          i.fa.fa-pencil 
+          span.xmhidden-small.hidden-md-down &nbsp;Wijzig pagina                                                                                                       
+div.xmuser#loginUser(style="display: none;")
+    a.dropdown-toggle(id="navbarLogin",data-toggle="dropdown",aria-haspopup="true",aria-expanded="false")
+      // If we're masquerading as someone
+      if learner
+        i.fa.fa-user-secret 
+        span.hidden-md-down#userMasqueradingName &ldquo;#{learner.name.split(" ")[0]}&rdquo;
+      else
+        i.fa.fa-user 
+        span.hidden-md-down#userFirstName Me
+    ul.xmuser-inhoud
+      if learner
+        li a(href=url.replace('users/' + learner._id + '/', '')) <i class='fa fa-user'></i> Stop Pretending
+      li: a(href=toValidPath(`/users/me`)) <i class='fa fa-cogs'></i> Profile
+      li: a#menu-supervise(href=toValidPath('/supervise'),style="display: none;") <i class='fa fa-eye'></i> Supervise
+      //- li: a(href=toValidPath("/logout")) <i class='fa fa-sign-out'></i> Logout
+//- div#loginGuest(style="display: none;")
+//-   li.nav-item.dropdown
+//-     a.nav-link.dropdown-toggle(id="navbarLogin",data-toggle="dropdown",aria-haspopup="true",aria-expanded="false")
+//-       | <i class="fa fa-sign-in"></i>
+//-       span.hidden-md-down &nbsp;Sign In
+//-     div.dropdown-menu.dropdown-menu-right(aria-labelledby="navbarLogin")
+//-       if config.googleAuth
+//-         a.dropdown-item(href=toValidPath("/auth/google")) <i class='fa fa-google'></i> Sign In with Google
+//-       if config.twitterAuth
+//-         a.dropdown-item(href=toValidPath("/auth/twitter")) <i class='fa fa-twitter'></i> Sign In with Twitter
+//-       if config.githubAuth
+//-         a.dropdown-item(href=toValidPath("/auth/github")) <i class='fa fa-github'></i> Sign In with GitHub
+//-       if config.localAuth
+//-         div.dropdown-divider
+//-         form#form-login(action=toValidPath("/auth/local"),method="post")
+//-           div.input-group
+//-             input.form-control#username(name="username",type="text",placeholder="Username")               
+//-           div.input-group                     
+//-             input.form-control#password(name="password",type="password")
+//-           button.btn.btn-primary.btn-default#button-login(type="submit") Sign In
+if !landingPage && !(repositoryName && ((activity && activity.xourse && activity.xourse.path) || (xourse && xourse.path)))
+        div.xmhelp: a(href=("mailto:zomercursus@kuleuven.be"))
+          i.fa.fa-envelope-o
+          span.xmhidden-small &nbsp; Contact
+
+          //- Contacteer het zomercursusteam
+if !landingPage && (repositoryName && ((activity && activity.xourse && activity.xourse.path) || (xourse && xourse.path)))
+        div.xmhelp: a(id="contact-instructor", href=toValidPath(`/${repositoryName}/${(activity ? (activity.xourse) : xourse).path}/instructors`))
+          i.fa.fa-envelope-o
+          span.xmhidden-small &nbsp; Contact
+          //- Contacteer de lesgevers

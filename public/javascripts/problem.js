@@ -3,7 +3,7 @@ var _ = require('underscore');
 var TinCan = require('./tincan');
 var database = require('./database');
 
-var hintCountdown = 30;
+var hintCountdown = 10;
 
 $(function() {
     var timer = window.setInterval( function() {
@@ -18,7 +18,7 @@ $(function() {
     }, 1000);
 });
 
-var hintButtonHtml = '<button class="btn btn-info btn-reveal-hint" type="button" data-toggle="tooltip" data-placement="top" title="Reveal the next hint."><i class="fa fa-life-ring"/>&nbsp; Reveal Hint<span class="counter" style="display: none;"> (<span class="count">1</span> of <span class="total">1</span>)</span><span class="hint-locked" style="display: none;"><span class="countdown"> (<i class="fa fa-lock"/> <span class="seconds-remaining">1</span>)</span><span class="hint-unlocked" style="display: none;"> <i class="fa fa-unlock"/></span></span></button>';
+var hintButtonHtml = '<button class="btn btn-info btn-reveal-hint" type="button" data-toggle="tooltip" data-placement="top" title="Toon de volgende hint."><i class="fa fa-life-ring"></i>&nbsp; <span class="hint-text">Toon Hint</span><span class="counter" style="display: none;"> (<span class="count">1</span> of <span class="total">1</span>)</span><span class="hint-locked" style="display: none;"><span class="countdown"> (<i class="fa fa-lock"></i> <span class="seconds-remaining">1</span>)</span><span class="hint-unlocked" style="display: none;"> <i class="fa fa-unlock"></i></span></span></button>';
 
 var createProblem = function() {
     var problem = $(this);
@@ -114,8 +114,9 @@ var createProblem = function() {
 	hints.push( event.target );
 	problem.data( 'hints', hints  );
 	
-	if (hints.length == 1) {
-	    hintButton.click( function(event) {
+	if (hints.length === 1) {
+		var firstHint = _.first(_.filter(hints, function (element) { return !$(element).persistentData('available'); }));
+		hintButton.click( function(event) {
 		if (hintCountdown > 0) {
 		    hintButton.find( ".hint-locked" ).show();		    
 		    return;
@@ -125,16 +126,23 @@ var createProblem = function() {
 		
 		var revealed = _.filter( hints, function(element) { return $(element).persistentData('available'); } );
 		hintButton.find( ".count" ).html( revealed.length + 1 );
-		
-		var nextHint = _.first( _.filter( hints, function(element) { return ! $(element).persistentData('available'); } ) );
+		var nextHint = _.first(_.filter(hints, function (element) { return !$(element).persistentData('available'); }));
 		$(nextHint).persistentData('available', true );
 		$(nextHint).persistentData('collapsed', false );
 
-		nextHint = _.first( _.filter( hints, function(element) { return ! $(element).persistentData('available'); } ) );		
+		nextHint = _.first( _.filter( hints, function(element) { return ! $(element).persistentData('available'); } ) );	
 		if (!nextHint) {
 		    problem.persistentData('uncovered-all-hints', true );
+		} else if ($(nextHint).hasClass('feedback')){
+			hintButton.find('.hint-text').text('Toon Uitwerking');
+			hintButton.addClass('oplossing');    /* to overwrite text in css (English) ... */
 		}
-	    });
+		});
+		
+		if ($(firstHint).hasClass('feedback')) {
+			hintButton.find('.hint-text').text('Toon Uitwerking');
+			hintButton.addClass('oplossing');    /* to overwrite text in css (English) ... */
+		}
 
 	    problem.persistentData( function() {
 		if (problem.persistentData( 'uncovered-all-hints' ))
@@ -145,8 +153,10 @@ var createProblem = function() {
 	    
 	    problem.prepend( hintButton );	    
 	} else {
-	    hintButton.find( ".total" ).html( hints.length );
+		hintButton.find( ".total" ).html( hints.length );
 	}
+
+	
 
 	var revealed = _.filter( hints, function(element) { return $(element).persistentData('available'); } );
 		

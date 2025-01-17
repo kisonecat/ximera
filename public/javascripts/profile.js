@@ -93,7 +93,7 @@ $(document).ready(function() {
 	console.log('requesting secret');
 
 	$.ajax({
-	    url: '/users/' + $(button).attr("userId") + '/secret',
+		url: window.toValidPath('/users/' + $(button).attr("userId") + '/secret'),
 	    type: 'PUT',
 	    success: function(result) {
 		$('#api-key').fadeOut(function() {
@@ -127,7 +127,7 @@ $(document).ready(function() {
 	
 	if ($(button).attr("connected")) {
 	    $.ajax({
-		url: '/users/' + $(button).attr("userId") + '/' + $(button).attr("id"),
+		url: window.toValidPath('/users/' + $(button).attr("userId") + '/' + $(button).attr("id")),
 		type: 'DELETE',
 		success: function(result) {
 		    console.log( "linked-account click result = ", result );
@@ -164,7 +164,7 @@ $(document).ready(function() {
 	$('button .fa-spinner', '#bridge-' + button.attr("data-bridge")).show();
 
 	$.ajax({
-	    url: '/users/' + button.attr("data-userId") + '/bridges/' + button.attr("data-bridge"),
+		url: window.toValidPath('/users/' + button.attr("data-userId") + '/bridges/' + button.attr("data-bridge")),
 	    type: 'DELETE',
 	    success: function(result) {
 		$('#bridge-' + button.attr("data-bridge")).fadeOut(500, function() { $(this).remove(); });

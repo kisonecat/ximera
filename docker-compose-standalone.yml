@@ -1,0 +1,23 @@
+version: '3'
+services:
+  ximera:
+    build:
+      context: .
+#      dockerfile: Dockerfile-Standalone
+    ports:
+    - "2000:2000"
+    environment:
+      - PORT=2000
+      - ROOT_URL=http://localhost:2000
+    volumes:
+      - repos:/usr/var/server/repositories
+      - gpg:/root/.gnupg
+      - mongodata:/data/db
+      - ./:/usr/var/server
+volumes:
+  repos:
+#    external:
+#       name: ximera-server-2021_repos
+  gpg:
+  mongodata:
+

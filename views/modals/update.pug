@@ -2,13 +2,20 @@
   .modal-dialog(role="document")
     .modal-content
       .modal-header
-        h5(class="modal-title",id="updateModalLabel") Updated Version Available
+        h5(class="modal-title",id="updateModalLabel")
+          span.nl-text Nieuwe Versie Beschikbaar
+          span.en-text New Version Available
         button.close(type="button",data-dismiss="modal",aria-label="Close")
           span(aria-hidden="true") &times;          
       .modal-body
-          p There is an <strong>updated version</strong> of this activity. If you update to the most recent version of this activity, then your current progress on this activity will be erased. Regardless, your record of completion will remain.  How would you like to proceed?
+          p.nl-text Er is een <strong>update</strong> van deze pagina. Als je update naar de meest recente versie, verlies je mogelijk je huidige antwoorden voor deze pagina. Hoe wil je verdergaan ?
+          p.en-text There is an <strong>updated version</strong> of this page. If you update to the most recent version, then your current progress on this page will be erased. Regardless, your record of completion will remain.  How would you like to proceed?
       .modal-footer
         button.btn.btn-default(type="button",data-dismiss="modal")
-          | <i class="fa fa-level-down"></i>&nbsp;Keep the old version.
+          | <i class="fa fa-level-down"></i>&nbsp;
+          span.nl-text Behoud de oude versie.
+          span.en-text Keep the old version.
         a.btn.btn-warning#update-version-button(href="#")
-          | <i class="fa fa-level-up"></i>&nbsp;Delete my work and update to the new version.
+          | <i class="fa fa-level-up"></i>&nbsp;
+          span.nl-text Verwijder mijn werk en update naar de nieuwste versie.
+          span.en-text Erase my work and update to the newest version.

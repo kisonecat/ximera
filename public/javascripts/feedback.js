@@ -17,17 +17,24 @@ var createFeedback = function() {
 
     var problem = feedback.parents( ".problem-environment" ).first();
 
-    if (feedback.attr('data-feedback') == 'attempt') {
+    if (feedback.attr('data-feedback') === 'attempt') {
 	problem.on( 'ximera:attempt', function(event) {
 	    feedback.persistentData( 'available', true );
 	});
     }
 
-    if (feedback.attr('data-feedback') == 'correct') {
+    if (feedback.attr('data-feedback') === 'correct') {
 	problem.on( 'ximera:correct', function(event) {
 	    feedback.persistentData( 'available', true );
 	});
-    }
+	}
+	
+	if (feedback.attr('data-feedback') === 'solution') {
+		feedback.trigger('ximera:register-hint')
+		/*problem.on('ximera:showsolution', function (event) {
+			feedback.persistentData('available', true);
+		});*/
+	}
 
     if (feedback.attr('data-feedback') == 'script') {
 	problem.on( 'ximera:attempt', function(event) {

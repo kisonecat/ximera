@@ -18,17 +18,31 @@ var createActivityCard = function() {
     ////////////////////////////////////////////////////////////////
     // add counters
     var itself = 0;
-    if (activityCard.hasClass('chapter')) itself = 1;
-    activityCard.attr( 'data-chapter-counter', activityCard.prevAll('.activity-card.chapter').length + itself );
-    var label = activityCard.attr( 'data-chapter-counter' );
+    if (activityCard.hasClass('part')) itself = 1;
+    activityCard.attr('data-part-counter', activityCard.prevAll('.activity-card.part').length + itself);
+    itself = 0;
+    var label = activityCard.attr('data-part-counter');
+
+    if (!(activityCard.hasClass('part'))) {
+        if (activityCard.hasClass('chapter')) itself = 1;
+        activityCard.attr('data-chapter-counter', activityCard.prevUntil('.activity-card.part', '.activity-card.chapter').length + itself);
+        label = label + "." + activityCard.attr( 'data-chapter-counter' );
+    }
     
     if (!(activityCard.hasClass('chapter'))) {
-	activityCard.attr( 'data-section-counter', activityCard.prevUntil('.activity-card.chapter', '.activity-card' ).not('.part').length + 1 );
-	label = label + "." +  activityCard.attr( 'data-section-counter' );
+        activityCard.attr('data-section-counter', activityCard.prevUntil('.activity-card.chapter', '.activity-card' ).not('.part').length + 1);
+        label = label + "." +  activityCard.attr( 'data-section-counter' );
     }
 
     if ((activityCard.attr( 'data-chapter-counter' ) != "0") && (!(activityCard.hasClass('part')))) {
-	$('h4', activityCard).prepend( '<span class="card-number">' + label + '</span>' );
+	$('.card-header', activityCard).prepend( '<span class="card-number">' + label + '</span>' );
+	// MYBADBAD: also add nav-counter (for grid layout, without cards ...!)
+	$(activityCard).attr('data-nav-counter' , label );
+    }
+
+    if (activityCard.hasClass('part')) {
+	// MYBADBAD: also add number to parts ...
+	$(activityCard).attr('data-nav-counter' , activityCard.attr('data-part-counter' ));
     }
 	
     // This is the new method for storing completion data

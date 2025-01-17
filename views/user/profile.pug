@@ -40,7 +40,7 @@ mixin displayBridge(bridge)
           for role in bridge.roles 
             <span class="badge badge-default">#{role}</span>&nbsp;
       | in&nbsp;
-      a(href=`/${bridge.repository}/${bridge.path}`)
+      a(href=toValidPath(`/${bridge.repository}/${bridge.path}`))
         code #{bridge.repository}/#{bridge.path}
       if bridge.lisResultSourcedid && bridge.lisOutcomeServiceUrl && bridge.dueDate
         | &nbsp;due&nbsp;
@@ -103,7 +103,7 @@ block content
               | The public profile has been changed.
           if editable
             div.ml-auto
-              a.btn.btn-primary(role="button", href=`/users/${person._id}/edit`) <i class="fa fa-pencil"></i> Edit                    
+              a.btn.btn-primary(role="button", href=toValidPath(`/users/${person._id}/edit`)) <i class="fa fa-pencil"></i> Edit                    
         if person.biography && person.biography.length > 0
           .row
               div.card.my-2.w-100

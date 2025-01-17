@@ -1,7 +1,4 @@
 var $ = require('jquery');
-var _ = require('underscore');
-var async = require('async');
-var io = require('socket.io-client');
 
 var socket;
 
@@ -16,7 +13,7 @@ function getUser( userId ) {
 	var image = $('<img class="d-flex mr-3">');
 	user.prepend(image);
 
-	var body = $('<div class="media-body" style="overflow: hidden;"><h5 class="mt-0"><a href="/users/' + userId + '"><span class="supervised-name"></span></a> <small><a class="supervised-email"href="#"></a></small></h5><div class="supervised-completions"></div></div>');
+	var body = $('<div class="media-body" style="overflow: hidden;"><h5 class="mt-0"><a href="' + window.toValidPath('/users/'+userId) + '"><span class="supervised-name"></span></a> <small><a class="supervised-email"href="#"></a></small></h5><div class="supervised-completions"></div></div>');
 	user.append(body);
 	
 	supervision.append(user);
@@ -81,7 +78,7 @@ function completion( userId, repositoryName, activityPath, complete ) {
 	card.attr('data-path', activityPath);
 	card.attr('data-complete', complete);
 
-	var url = '/users/' + userId + '/' + repositoryName + '/' + activityPath;
+	var url = window.toValidPath('/users/' + userId + '/' + repositoryName + '/' + activityPath);
 	card.prepend($('<div class="media-body" style="overflow: hidden;"><h5 class="d-flex align-items-center"><div style="width: 48pt;" class="mr-2 progress h-100"><div class="progress-bar bg-success" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div></div><a style="text-overflow: ellipsis; overflow: hidden;" href="' + url + '">' + repositoryName + '/' + activityPath + '</a></h5></div>'));
 	
 	$('.supervised-completions', user).prepend(card);
@@ -102,7 +99,7 @@ function supervise() {
     if (window.location.protocol === "https:") {
 	websocketUrl = "wss:";
     }
-    websocketUrl += "//" + window.location.host + "/ws";
+websocketUrl += "//" + window.location.host + window.toValidPath("/ws");
 
     try {
 	console.log( "Attempting websocket connection...");

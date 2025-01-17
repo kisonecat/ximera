@@ -10,7 +10,7 @@ var callback = undefined;
 $(function() {
     if ($("#guppy").length > 0) {
 	Guppy.init({"path":"/lib/guppy",
-		    "symbols":"/public/json/symbols.json"
+		    "symbols":window.toValidPath("/public/json/symbols.json")
 		   });
 	
 	guppyDiv = new Guppy("guppy", {

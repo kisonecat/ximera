@@ -1,6 +1,6 @@
 extends ../layouts/main
 include ../activity-card.pug
-
+ 
 block title
   | !{xourse.title}
 
@@ -8,12 +8,15 @@ block modals
   include ../modals/update-xourse
   
 block content
+  // Include css files from the repository
+  link(rel="stylesheet",type="text/css",href=toValidPath("/" + repositoryName + "/global.css"))
+  link(rel="stylesheet",type="text/css",href=toValidPath("/" + repositoryName + "/" + xourse.path + ".css"))
   nav(aria-label="breadcrumb",role="navigation")
     ol.breadcrumb
-      li.breadcrumb-item
-        - var level = 1;      
-        a(href="/" + repositoryName, aria-level=level)
-            | !{repositoryName}
+      //- li.breadcrumb-item
+      //-   - var level = 1;      
+      //-   a(href=toValidPath("/" + repositoryName), aria-level=level)
+      //-       | !{repositoryName}
       li.breadcrumb-item.active
         if (xourse.title) && (xourse.title != '')
           | !{xourse.title}
@@ -24,12 +27,16 @@ block content
     main.xourse.card-group(data-commit=xourse.commit, data-hash=xourse.hash, data-points=xourse.totalPoints, data-path=xourse.path, data-repository-name=repositoryName, data-learner=learner ? learner._id : undefined, data-xourse-path=xourse.path, data-xourse-url=repositoryName + '/' + xourse.path)
       for activityUrl in xourse.activityList
         +xourseCard(repositoryName, xourse.path, activityUrl, xourse.activities[activityUrl])
-  div.container        
-    hr
-    .row
-      .col-md-12
-        p You can download a 
-          a.btn.btn.btn-primary(type="button", href="/" + repositoryName + "/" + xourse.path + "/certificate")
-            | <i class="fa fa-certificate"></i> Certificate
-          | &nbsp;as a record of your successes.
+    div.container(style="margin:15px")
+      hr
+      .row
+        if xourse.downloads && xourse.downloads.length > 0
+        table(border="1",cellspacing="0",style="border-collapse: separate")
+          thead
+            th(style="background:grey;padding:5px;padding-left:15px;padding-right:15px") Downloads
+          tbody
+          for download in xourse.downloads
+            tr
+              td(style="padding:2px;padding-left:15px;padding-right:15px;word-break: break-all;")
+                a(href=download.url) #{download.label}
     

@@ -7,10 +7,10 @@ var async = require('async');
 const uuidv1 = require('uuid/v1');
 var mongo = require('mongodb');
 
-var redis = require('redis');
+const Redis = require("ioredis");
 
 // create a new redis client and connect to our local redis instance
-var client = redis.createClient();
+var client = new Redis({ host: config.redis.url, port: config.redis.port });
 
 // if an error occurs, print it to the console
 client.on('error', function (err) {
@@ -23,6 +23,7 @@ var passback = pug.compileFile(path.join(__dirname,'../views/lti/passback.pug'))
 var DEBOUNCE = 1000 * 60 * 3;
 
 function processGradebook(id, callback) {
+	console.log('Processing gradebook ' + id)
     mdb.LtiBridge.findOne( {_id: new mongo.ObjectID(id) }, function(err, bridge) {
 	if (err) {
 	    callback(err);
@@ -57,7 +58,7 @@ function processGradebook(id, callback) {
 			};
 			
 			request.post({
-			    url: url,
+			    uri: url,
 			    body: pox,
 			    oauth: oauth,
 			    headers: {
@@ -65,6 +66,8 @@ function processGradebook(id, callback) {
 			    }
 			}, function(err, response, body) {
 			    if (err) {
+					console.log('Error when posting:')
+					console.log(err)
 				callback(err);
 			    } else {
 				bridge.submittedScore = true;
@@ -78,13 +81,22 @@ function processGradebook(id, callback) {
 }
 
 function process() {
+	// console.log('Running process')
     client.zrangebyscore('gradebook', -Infinity, Date.now(), function(err, responses) {
-	if (err) return;
+		//console.log('Responses ')
+		//console.log(responses)
+	if (err){
+		console.log('Processing error:')
+		console.log(err)
+		return;
+	}
 	async.each( responses, function(response, callback) {
+		
 	    client.zrem( 'gradebook', response, function(err, count) {
 		if ((!err) && (count == 1)) {
 		    processGradebook(response, callback);
 		} else {
+			console.log(err)
 		    callback(err);
 		}
 	    });
@@ -100,12 +112,19 @@ exports.record = function(req, res, next) {
     if (!req.user) {
 	next('No user logged in.');
     } else {
+		console.log('gradebook.record for ' + req.user._id + ' (' + repositoryName +'/'+ req.params.path +')');
 	mdb.LtiBridge.find( {user: req.user._id, repository: repositoryName, path:req.params.path }, function(err, bridges) {
+		// console.log('i')
 	    if (err) {
+			console.log(err)
 		next(err);
 	    } else {
+			// console.log('n')
+			// console.log(bridges)
 		async.each( bridges,
 			    function(bridge, callback) {
+					// console.log(bridge.dueDate)
+					// console.log(bridge.dueDate < Date.now())
 				// Silently ignore attempts to submit homework after the due date
 				if (bridge.dueDate < Date.now()) {
 				    callback(null);
@@ -113,6 +132,7 @@ exports.record = function(req, res, next) {
 				}
 				
 				var pointsPossible = parseInt(bridge.pointsPossible);
+				// console.log(pointsPossible)
 				if (pointsPossible == 0) {
 				    callback(null);
 				    return;
@@ -143,7 +163,8 @@ exports.record = function(req, res, next) {
 				    callback(null);
 				    return;
 				}
-
+				
+				console.log('New best score for bridge: '+bridge.resultScore + ' / ' + bridge.resultTotalScore); 
 				bridge.submittedScore = false;
 				
 				bridge.save(function(err) {

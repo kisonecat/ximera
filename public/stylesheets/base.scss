@@ -1,9 +1,9 @@
-@import "/node_modules/guppy-dev/build/guppy-default.min.css";
+@import "./node_modules/guppy-dev/build/guppy-default.min";
 @import "guppy-fixes";
 
 @import "flash";
 
-@import "/node_modules/codemirror/lib/codemirror.css";
+@import "./node_modules/codemirror/lib/codemirror";
 
 $enable-rounded: false;
 
@@ -16,6 +16,11 @@ $red:    #bb0000 !default;
 
 // Bootstrap v4 ftw
 @import "./node_modules/bootstrap/scss/bootstrap.scss";
+
+.embed-responsive {
+    width: 30vw; // Max 30% of view width
+    margin: 0 auto; // horizontal align
+}
 
 // Don't display hover on mobile devices
 @media (any-hover: hover) {
@@ -42,7 +47,7 @@ $red:    #bb0000 !default;
 @import "pulsate";
 
 // Font-awesome includes its own cache busting code
-$fa-font-path:        '/node_modules/font-awesome/fonts/';
+//$fa-font-path: '/voorkennis/node_modules/font-awesome/fonts/';
 @import "./node_modules/font-awesome/scss/font-awesome.scss";
 
 /* The theorem environments live in theorems.scss. If you add more
@@ -74,6 +79,15 @@ nav {
 // as are headings
 .sectionHead, .likesectionHead, .subsectionHead, .likesubsectionHead, .likesubsubsectionHead {
     font-family:  -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+.ui-widget {
+    font-family: MJX_Main !important;
+    font-size: unset !important;
+}
+
+.ui-accordion .ui-accordion-header {
+    font-size: 1.1em !important;
 }
 
 @import "footer";
@@ -111,14 +125,6 @@ height: auto;
 @import "latex";
 @import "push-down-footer";
 
-/* Pictures shouldn't be so big that they can't be seen on the screen */
-.image-environment img {
-    max-width: 60vw;
-    max-height: 60vh;
-    object-fit: contain;
-    -o-object-fit: contain;
-}
-
 @import "hints";
 
 @import "byline";
@@ -129,12 +135,17 @@ height: auto;
 
 @import "print";
 
+@import "grid";
+
+@import "topbar";
+
 @import "xourse";
 
 /* I do not understand why this is in bootstrap, but without it there
    is space between my breadcrumb'd navbar and the content */
 nav .breadcrumb {
     margin-bottom: 0;
+    padding: 0rem 1rem;
 }
 
 /* tex4ht generates enumerate-enumitem as description lists.  I want
@@ -240,3 +251,9 @@ div.quote p {
 .verb {
     @extend code;
 }
+
+.en-text {
+    display: none;
+}
+
+@import './lds.scss'

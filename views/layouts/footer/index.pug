@@ -1,54 +1,7 @@
+//- Adapted for KU Leuven
 footer.bg-inverse.text-white
     .container
       .row
-        if (!atColoradoState)
-          .col-md-3.hidden-sm-down
-            h5
-              a(href="/mooculus/") Courses
-            ul
-              a(href="/mooculus/calculus1") Calculus One
-              a(href="/mooculus/calculus2") Calculus Two
-              a(href="/mooculus/calculus3") Calculus Three
-        .col-md-3
-          h5.hidden-sm-down
-            a(href="/about/overview") About
-          ul
-            a(href="/about/faq") FAQ
-            a(href="/about/team") Development Team
-            a(href="/about/workshop") Workshop
-            a(href='/about/contact') Contact Us 
-              i.fa.fa-envelope            
-        .col-md-3.hidden-sm-down
-          h5 Social
-          ul
-            a(href='http://www.facebook.com/sharer.php?u=' + absoluteUrl)
-              | Facebook 
-              i.fa.fa-facebook
-            a(href='http://twitter.com/intent/tweet?status=' + absoluteUrl + ' @XimeraProject')
-              | Twitter 
-              i.fa.fa-twitter
-            a(href='https://plus.google.com/share?url=' + absoluteUrl)
-              | Google Plus 
-              i.fa.fa-google-plus
-            a(href='https://github.com/kisonecat/ximera')
-              | GitHub 
-              i.fa.fa-github-alt
-
-        .col-md-3.address.hidden-sm-down
+        .col-md-7
           p
-            | Built at <a href="http://www.osu.edu/"><span class="hidden-md-down">The Ohio State University</span><span class="hidden-lg-up">OSU</span></a> with <a href="/about/support">support from</a> <a href="http://www.nsf.gov/awardsearch/showAward?AWD_ID=1245433">NSF Grant DUE-1245433</a>, <span class="hidden-md-down">the</span> <a href="/about/support">Shuttleworth<span class="hidden-md-down"> Foundation</span></a>, <span class="hidden-md-down">the <a href="http://math.osu.edu/">Department of Mathematics</a>,</span> and <span class="hidden-md-down">the <a href="https://affordablelearning.osu.edu/">Affordable Learning Exchange</a></span><span class="hidden-lg-up"><a href="https://affordablelearning.osu.edu/">ALX</a></span>.
-      .row
-        .col-md-12.osu
-          if (atColoradoState)
-            img.hidden-sm-down(src=versionPath("/public/images/colorado-state/logo.png"))
-          else
-            img.hidden-sm-down(src=versionPath("/public/images/osu/osu-web-footer-wordmark-rev.png"))
-          p
-            | &copy; 2013&ndash;#{new Date().getFullYear()}, The Ohio State University <span class="hidden-xs-down">&mdash; <a href="/about/team">Ximera team</a></span>
-          p.hidden-xs-down
-            | 100 Math Tower, 231 West 18th Avenue, Columbus OH, 43210&ndash;1174
-          p.hidden-xs-down
-            | Phone: (773) 809&ndash;5659 | 
-            a(href='/about/contact') Contact
-          p
-            | If you have trouble accessing this page and need to request an alternate format, contact <a href="mailto:ximera@math.osu.edu">ximera@math.osu.edu</a>.
+            | Technology based on Ximera, &copy; 2013&ndash;#{new Date().getFullYear()}<span class="hidden-xs-down">, The Ohio State University &mdash; Ximera Team</span>

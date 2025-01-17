@@ -1,13 +1,33 @@
 var $ = require('jquery');
+require('jquery-ui/ui/widgets/accordion');
 var _ = require('underscore');
 var database = require('./database');
 
-var buttonHtml = '<button class="btn btn-info btn-xs btn-hint-collapse" type="button" aria-expanded="false" aria-controls="collapse"><i class="fa fa-chevron-down"/></button>';
+var buttonHtml = '<button class="btn btn-info btn-xs btn-hint-collapse" type="button" aria-expanded="false" aria-controls="collapse"><i class="fa fa-chevron-down"></i></button>';
+
+jQuery.fn.removeAttributes = function () {
+	return this.each(function () {
+		var attributes = $.map(this.attributes, function (item) {
+			return item.name;
+		});
+		var img = $(this);
+		$.each(attributes, function (i, item) {
+			img.removeAttr(item);
+		});
+	});
+}
 
 var createFoldable = function() {
     var foldable = $(this);
-    
-    var button = $(buttonHtml);
+	foldable.removeAttributes()
+	foldable.wrap('<div class="accordion"></div>')
+	foldable.before("<h3>Klap uit</h3>")
+
+	/*foldable.wrap(function () {
+		return '<div class="accordion"><h3>Klap uit</h3><div>'+ $(this).html() + '</div></div>'
+	});*/
+
+    /*var button = $(buttonHtml);
     foldable.before('<div class="clearfix"></div>');
     foldable.before(button);
 
@@ -37,12 +57,12 @@ var createFoldable = function() {
 	    $('.foldable', foldable).show();
 	}
 
-    });
+    });*/
 
 };
 
 $.fn.extend({
     foldable: function() {
-	return this.each( createFoldable );
+		this.each( createFoldable );
     }
 });    

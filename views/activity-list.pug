@@ -1,0 +1,37 @@
+mixin practiceXourseCardOld(locator, url, card, active)
+  a.activity-card(class=card.cssClass, data-weight=card.weight, href=toValidPath(locator + "/" + url),  data-repository-name=repositoryName, data-path=url, style=style, data-hashes=JSON.stringify(card.hashes))
+    div.progress.vertical
+      div.progress-bar.progress-bar-success(role="progressbar", style="width: 0%;")
+      
+mixin practiceXourseCard(locator, url, card, active)
+  .activity-card.text-center(class=card.cssClass + (active ? " active" : ""), data-toc-label=card.datatoclabel, data-weight=card.weight, href=toValidPath(locator + "/" + url), data-repository-name=repositoryName, data-path=url, style=style, data-hashes=JSON.stringify(card.hashes),data-toggle="tooltip",data-placement="bottom",title=card.title ? card.title : 'Practice')
+    a(href=toValidPath(locator + "/" + url))  
+    div.progress.vertical
+      div.progress-bar.bg-success(role="progressbar", style="width: 0%;")
+
+mixin titleXourseCard(locator, url, card, active)
+  li.activity-card.card-sectionheading.part-open(class=card.cssClass,data-toc-label=card.datatoclabel) !{card.title}
+       
+mixin linkXourseCard(locator, url, card, active)
+  li.activity-card(class=card.cssClass + (active ? " active" : ""),data-toc-label=card.datatoclabel,data-weight=card.weight, href=toValidPath(url), data-repository-name=repositoryName, data-path=url, style=style, data-hashes=JSON.stringify(card.hashes))
+    a(href=url, target="_blank") !{card.title}
+
+mixin regularXourseCard(locator, url, card, active)
+  li.activity-card(class=card.cssClass + (active ? " active" : ""),data-toc-label=card.datatoclabel,data-weight=card.weight, href=toValidPath(locator + "/" + url), data-repository-name=repositoryName, data-path=url, style=style, data-hashes=JSON.stringify(card.hashes))
+    a(href=toValidPath(locator + "/" + url)) !{card.title}
+       div.progress.xmprogresshidden
+         div.progress-bar(role="progressbar", style="width: 0%;")
+             
+mixin xourseCard(repositoryName, xourseUrl, url, card, active)
+   - var locator = ((learner && (learner._id != user._id)) ? ('/users/' + learner._id) : '') + ('/' + repositoryName + '/' + xourseUrl);
+   if (card.cssClass) && (card.cssClass.match( /practice/ ))
+     +practiceXourseCard( locator, url, card, active )
+   else
+     if url.match(/^#/)
+       +titleXourseCard( locator, url, card, active )     
+     else if url.match(/^http/)
+       +linkXourseCard( locator, url, card, active )     
+     else
+       +regularXourseCard( locator, url, card, active )
+
+

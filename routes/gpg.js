@@ -130,6 +130,9 @@ exports.token = function(req,res) {
 };
 
 exports.add = function(req, res) {
+	if(process.env.DISABLE_GPG_ADD==="true")
+		return res.status(404) // DISABLE ADDING KEYS
+
     if(req.body.keytext == null)
 	return res.send(404, "Missing keytext parameter.");
 

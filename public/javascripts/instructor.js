@@ -24,7 +24,7 @@ $(function() {
 	var hash = $(this).attr('data-activity-hash');
 	
 	$.ajax({
-	    url: '/statistics/' + url + '/' + hash,
+	    url: window.toValidPath('/statistics/' + url + '/' + hash),
 	    type: 'GET',
 	    success: function(result) {
 		if (result)

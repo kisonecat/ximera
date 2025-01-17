@@ -1,7 +1,8 @@
-var redis = require('redis');
+const Redis = require("ioredis");
+var config = require('../config');
 
 // create a new redis client and connect to our local redis instance
-var client = redis.createClient({return_buffers: true});
+var client = new Redis({ host: config.redis.url, port: config.redis.port});
 
 // if an error occurs, print it to the console
 client.on('error', function (err) {
@@ -9,7 +10,7 @@ client.on('error', function (err) {
 });
 
 exports.json = function( key, f, callback ) {
-    client.get(key, function(err, result) {
+    client.getBuffer(key, function(err, result) {
 	if (err) {
 	    callback(err);
 	} else {
@@ -20,7 +21,7 @@ exports.json = function( key, f, callback ) {
 		    if (err) {
 			callback( err );
 		    } else {
-			client.setex( key, 31557600, JSON.stringify(result) );
+			client.setBuffer( key, JSON.stringify(result), "ex", 31557600  );
 			callback( null, result );
 		    }
 		});
@@ -30,7 +31,7 @@ exports.json = function( key, f, callback ) {
 };
 
 exports.string = function( key, f, callback ) {
-    client.get(key, function(err, result) {
+    client.getBuffer(key, function(err, result) {
 	if (err) {
 	    callback(err);
 	} else {
@@ -41,7 +42,7 @@ exports.string = function( key, f, callback ) {
 		    if (err) {
 			callback( err );
 		    } else {
-			client.setex( key, 31557600, result );
+			client.setBuffer( key, result, "ex", 31557600 );
 			callback( null, result );
 		    }
 		});

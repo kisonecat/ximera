@@ -4,15 +4,15 @@ var database = require('./database');
 
 var answerHtml = '<div class="btn-group" style="vertical-align: center;">' +
 	'<button  type="button" class="btn btn-success btn-ximera-correct" data-toggle="tooltip" data-placement="top" title="Correct answer!" style="display: none" aria-label="correct answer" aria-live="assertive">' +
-	'<i class="fa fa-check"/>&nbsp;Correct' +
+	'<i class="fa fa-check"></i>&nbsp;Correct' +
 	'</button></div>' +
 	'<div class="btn-group" style="vertical-align: center;">' +
 	'<button  type="button" class="btn btn-danger btn-ximera-incorrect" data-toggle="tooltip" data-placement="top" title="Incorrect.  Try again!" style="display: none" aria-label="incorrect!  try again" aria-live="assertive">' +
-	'<i class="fa fa-times"/>&nbsp;Try again' +
+	'<i class="fa fa-times"></i>&nbsp;Try again' +
 	'</button></div>' +
 	'<div class="btn-group" style="vertical-align: center;">' +
 	'<button  type="button" class="btn btn-primary btn-ximera-submit" data-toggle="tooltip" data-placement="top" title="Click to check your answer.">' +
-	'<i class="fa fa-question"/>&nbsp;Check work' +
+	'<i class="fa fa-question"></i>&nbsp;Check work' +
 	'</button>' +
 	'</div>';
 

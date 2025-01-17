@@ -1,0 +1,611 @@
+// new classes for grid-based layout (could/should replace bootstrap ...?)
+// Based on https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Grid_Layout/Realizing_common_layouts_using_CSS_Grid_Layout
+// en https://stackoverflow.com/questions/48107353/allow-one-grid-item-to-scroll-with-fixed-header-and-sideba li marker
+
+// define names for the grid area's
+.main-title {
+    grid-area: title;
+    background-color: #00407A;
+    color: white;
+    display: flex;
+    align-items: flex-end;
+    column-gap: 10px;
+}
+
+.main-menu {
+  grid-area: menu;
+  position: sticky;
+  top: 0;
+  height: 100%;
+  z-index: 10;     // in front of content for hover effects in menu
+  background-color: #00407A;   // KULeuven blauw (logo)
+  color: white;
+}
+
+
+
+
+// .main-nav {
+//   //grid-area: maincontent;
+//   //position: sticky;
+//   box-sizing: border-box;
+//   overflow: auto;  
+//   resize: vertical;
+//   height: 40%;
+//   //width: 100%;
+//   width: 100%;
+// }
+
+.main-footer {
+  grid-area: footer;
+  display: none;
+  background-color: #00407A;   // KULeuven blauw (logo)
+  color: white;
+  text-align: center;
+  overflow: hidden;
+  height: 100%;
+}
+
+.xmdownload, .xmsettings, .xmuser {
+  position: relative;
+}
+
+.xmdownload-inhoud, .xmsettings-inhoud, .xmuser-inhoud {
+  display: none;
+  position: absolute;
+  list-style-type:none;
+  color: black;
+  width: max-content;
+  // min-width: 19rem;
+  right: -1rem;
+  background-color: #f9f9f9;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  border-radius: 5px;
+  padding: 12px 16px;
+  z-index: 1;
+}
+
+.menu ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+/* make items look like links ... */
+.xmsettings li {
+  color: #0275d8;
+}
+
+.xmdownload:hover .xmdownload-inhoud,
+.xmuser:hover .xmuser-inhoud,
+.xmsettings:hover .xmsettings-inhoud
+{
+  display: block;
+}
+
+.btn-warning {
+    padding: 1px 5px;
+    margin-left: 2px;
+}
+
+button#math-edit-button {
+  background-color: transparent;
+  padding: 0px;
+  border: 0px;
+}
+
+/* Hack ...*/
+a#contact-instructor {
+    color: white;
+    padding-right: 10px;
+}
+
+
+// overflow: scroll;
+// gap: 5px;
+.wrapper {
+  // position: fixed;
+  display: grid;
+  width: 100%;
+  height: 100%;
+  transition: 0.3s;
+  grid-template-areas:
+    "title"
+    "maincontent"
+    ;
+}
+
+
+.main-inhoud {
+  grid-area: maincontent;
+  width: 100%;
+  height: 100%;
+	width: 100%;
+	display: grid;
+	grid-template-areas:
+		"toc-head activity-head"
+		"toc      activity";
+	grid-template-columns: min-content 1fr;
+}
+
+.main-inhoud .toc-search {
+  grid-area: toc-head;
+  align-items: center;
+  display: flex;
+  background-color: #00407A;
+}
+
+
+.main-inhoud .toc {
+    grid-area: toc;
+    overflow: auto;
+    resize: horizontal;
+    width: clamp(5rem,20rem,100rem);
+    max-width: 100%; /* prevent bigger-than-grid-column */
+    max-width: min(100vw,80ch); 
+    // height: 100% !important;   /* HACK: fixes no-scrollbar-on-activity--when-toc-too-short */
+    padding: 0;
+    margin:0;
+}
+
+.main-inhoud .activity-title {
+  grid-area: activity-head;
+  background-color: #00407A;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.main-inhoud .main-activity{
+  grid-area: activity;
+  overflow-y: auto;
+}
+
+.main-inhoud .activity {
+    grid-area: activity;
+    max-width: 120ch;
+    height: 100%;
+    width: 100%;
+    overflow: auto;
+    margin: auto;
+    padding: 0 20px;
+}
+
+.main-inhoud .activity-title-center {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 120ch;
+  margin: auto;
+}
+
+.main-inhoud .activity-title .title {
+  width: 100%;
+  background-color: #DD8A2E;
+  color: white;
+  border: 1px solid;
+  border-radius: 3px;
+  text-align: center;
+  min-width: min-content;
+  margin:5px;
+  font-size: clamp(16px, 1.5vw,24px);
+}
+
+.xmprev, .xmnext{
+	padding: 0rem 1rem;
+  color: #0275d8;
+}
+
+/* prevent 'next' popup outside viewpaort ... */
+.xmnext .xmhidden {
+  right: 0px;
+}
+
+/* HACK: hide the compile-date that xake's  compile.go inserts ... */
+#page-content > span > small {
+  background: red;
+  display: none;
+}
+
+/* HACK: some global.css files set margins on -content for examples/definitions etc */
+div.main-inhoud.main-toc {
+	margin-top: 0px;
+	padding-left: 0px;
+}
+
+
+.main-toc ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-flow: column;
+  width: 100%;
+}
+
+.toc-search .btn {
+  background: transparent;
+  color: #0275d8;
+  padding: 0px 5px;
+}
+
+.xourse-search {
+  height: 1.5rem;
+  margin-left: 5px;
+  font-style: italic;
+  border-radius: 5px;
+}
+
+#xourse-clear {
+  display: none;
+}
+
+.toc li {
+  padding: 1px;
+}
+
+// hack to get chapter/sectionnumbers in toc ...)
+.toc li::before {
+   content: attr(data-nav-counter)"  ";
+   padding: 0 0 0 0.2rem;
+   min-width: 2rem;
+   display: inline-block;   
+}
+
+.toc a {
+   color: inherit;
+}
+
+.toc .xourse {
+ font-size: larger;
+ background-color: #00407A;;  // KU Leuven dark blauw 
+}
+
+.toc .part {
+ font-size: larger;
+ background-color: #1D8DB0;  // KU Leuven medium blauw (alt: #116E8A )
+}
+
+.toc .chapter {
+ font-size: 90%;
+}
+
+.toc .section {
+ font-size: 75%;
+}
+
+// reset from bootstrap ...
+.toc .card, 
+{
+  display: initial;
+  flex: initial;
+  position: relative;
+  border: 1px solid rgba(0, 0, 0, 0.125);
+  width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.toc .activity-card {
+  color: black;
+}
+
+.toc .activity-card > a:first-of-type {
+    position: initial;
+}
+
+.toc .card.activity-card.part::before{
+    padding: 0 0;
+}
+
+.toc .card.activity-card.section{
+    background-color: #1FABD540; // KU Leuven light even lighter
+}
+
+// The active card is displayed in an active way
+.toc .activity-card.active {
+    background-color: #DD8A2E !important;   // KULeuven accent
+    color: white;
+    border-color: $gray-dark;
+//    @extend .card-inverse;
+}
+
+#main {
+  transition: margin-left .5s;
+  padding: 16px;
+}
+
+// sizing not yet OK ...
+
+@media all and (max-width: 768px) {
+  // .wrapper {
+  //   grid-template-rows: 60px calc(100vh - 90px);
+  //  }
+
+   .main-inhoud {
+    grid-template-areas:
+      "activity-head"
+      "activity"
+      "toc-head" 
+      "toc"      
+      ;
+    grid-template-columns: 1fr;
+  }
+
+  .main-inhoud .toc {
+    width: 100% !important;    /* always full width on small screens */
+  }
+
+}
+
+/* Overwrite bootstrap defaults */
+.progress {
+    display: flex;
+    overflow: hidden;
+    font-size: 0.75rem;
+    line-height: 1rem;
+    text-align: center;
+    position: absolute;
+    top: 0.5em;
+    left: 3em;
+    z-index: 100;
+    height: 100%;
+    width: 100%;
+    opacity: 0.5;
+    background-color: transparent;
+}
+
+.progress-bar {
+    height: 1em;
+    color: #fff;
+    // background-color: #0275d8;
+    background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
+    background-size: 1rem 1rem;
+    background-color: #5cb85c 
+}
+
+.xmprogresshidden {
+	display: none;
+}
+
+button#math-edit-button {
+  padding: 2px;
+  background-color: transparent;
+  border-color: white;
+}
+
+
+/* topbar*/
+
+.xmhidden {
+  display:none;
+  position: absolute;
+  color:white;
+  background-color: #00407A;   // KULeuven blauw (logo)
+  background-color: #1D8DB0;   // KULeuven medium
+  border: 2px solid;
+  border-radius: 3px;
+  padding: 5px;
+}
+
+.xmhover:hover .xmhidden {
+  display: block;
+}
+
+
+// in menu: Only icons on small screens
+.xmhidden-small {
+  display: unset;
+}
+
+
+// Main title (xourse, except when displaying isolated activity)
+.title-xourse,
+.title-activity {
+   margin-left: 16px;
+   flex-grow: 1;
+   font-size: clamp(16px, 2vw, 32px);
+   align-self: center;
+}
+.title-xourse a {
+  color: white;
+}
+
+/* for the logo .. */
+.main-title a {
+  align-self: flex-start;
+}
+.main-title .logo {
+    max-width: 20vw;
+    min-width: 100px;
+    opacity: 0.9;
+	  margin: 5px;
+	  padding: 5px;
+    vertical-align: baseline;
+    background-color: white; /* for 'ximera' logo ... */    
+}
+
+.title {
+  background-color: #DD8A2E;  // KULeuven accent
+  color: white;
+  border: 1px solid;
+  border-radius: 3px;
+  text-align: center;
+  width: clamp(15em, calc(100% - 500px), 50em);   // correct values to be determined
+  min-width: min-content;
+  // calc needed for sass ...???
+}
+
+.xmsave {
+  margin-left: auto;
+}
+
+.logo a:hover {
+  text-decoration: none;
+}
+.menu {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+.menu li {
+  font-size: 16px;
+  //padding: 15px 5px;
+  padding: 0 1rem;
+  white-space: nowrap;
+}
+.logo a,
+.toggle a {
+  font-size: 20px;
+}
+.button.secondary {
+  border-bottom: 1px #444 solid;
+}
+
+
+.menu {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  background-color: red; 
+  background-color: #f9f9f9;
+  background-color: #00407A;;  // KU Leuven dark blauw 
+
+
+}
+.toggle {
+  order: 1;
+}
+.item.button {
+  order: 2;
+}
+.item {
+  width: 100%;
+  text-align: center;
+  order: 3;
+  display: none;
+  color: white;
+}
+.item.active {
+  display: block;
+}
+.item a {
+  color: white;  // needed ?
+}
+
+/* Navbar Toggle */
+.toggle {
+  cursor:pointer;
+  margin-left: auto;
+}
+.bars {
+  background: #999;
+  display: inline-block;
+  height: 2px;
+  position: relative;
+  transition: background .2s ease-out;
+  width: 18px;
+}
+.bars:before,
+.bars:after {
+  background: #999;
+  content: '';
+  display: block;
+  height: 100%;
+  position: absolute;
+  transition: all .2s ease-out;
+  width: 100%;
+}
+.bars:before {
+  top: 5px;
+}
+.bars:after {
+  top: -5px;
+}
+
+/* Tablet menu */
+@media all and (min-width: 22468px) {
+  .menu {
+      justify-content: center;
+  }
+
+  .logo {
+      // flex: 1;
+  }
+
+  .item.button {
+      width: auto;
+      order: 1;
+      display: block;
+  }
+  .toggle {
+      order: 2;
+  }
+  .button.secondary {
+      border: 0;
+  }
+  .button a {
+      padding: 7.5px 15px;
+      background: teal;
+      border: 1px #006d6d solid;
+      border-radius:50em;
+  }
+  .button.secondary a {
+      background: transparent;    
+  }
+  .button a:hover {
+      text-decoration: none;
+      transition:all .25s;
+  }
+  .button:not(.secondary) a:hover {
+      background: #006d6d;
+      border-color: #005959;
+  }
+  .button.secondary a:hover {
+      color: #ddd;
+  } 
+}
+
+/* Desktop menu */
+@media all and (min-width: 22768px) {
+  .xmhidden-small {
+    display: unset;
+  }
+
+  .title-xourse,
+  .title-activity {
+     margin-left: 2em;
+  }
+
+  .item {
+      display: block;
+      width: auto;
+  }
+  .toggle {
+      display: none;
+  }
+  .logo {
+      order: 0;
+  }
+  .item {
+      order: 1;
+  }
+  .button {
+      order: 2;
+  }
+  .menu li {
+      // padding: 15px 10px;
+      padding: 0 5px;
+  }
+  .menu li.button {
+      padding-right: 0;
+  }
+
+}
+
+/* Set logo on non-xourse pages  (was in brand.pug) */
+img.brandlogo {
+  max-height: 2rem;
+  max-width: 20vw;
+}

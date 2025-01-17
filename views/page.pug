@@ -1,4 +1,4 @@
-extends layouts/main
+extends layouts/grid
 
 block title
   if activity.title
@@ -6,26 +6,84 @@ block title
   else
     | Activity
 
+block css
+  // Include css files from the repository
+  link(rel="stylesheet",type="text/css",href=toValidPath("/" + repositoryName + "/global.css"))
+  link(rel="stylesheet",type="text/css",href=toValidPath("/" + repositoryName + "/" + activity.xourse.path + ".css"))
+  // link(rel="stylesheet",type="text/css",href=toValidPath("/" + repositoryName + "/" + activity.xourse.path + "/" +activity.path + ".css"))
+
 block modals
   include modals/reset  
   include modals/update
   include modals/guppymath
+  include modals/image
 
-block content
-  // BADBAD: shouldn't this be removed now that htlatex is working
-  // fine? No! Apparently htlatex still doesn't support two optional
-  // arguments like this.
-  include page/global-preamble
-  include page/navigation
-  if activity.xourse.title
-    include page/breadcrumbs
-  div.container-fluid
-    // BADBAD: only display navigation if the item can be found IN a navigation list
-    .row
-      .col-md-12
-    .row.justify-content-center
-      .col-md-10
+block maintitle
+    // Could/should become 'xourseHomeLink' and 'xourseLogo' from REPO ...? 
+    a(href=config.brandHomeLink)
+          img.brandlogo.logo(src=toValidPath(versionPath(config.brandLogo)))
+    // Show xourse-title (unless activity is not part of xourse ...)
+    if (activity.xourse.title) && (activity.xourse.title != '')
+      span.title-xourse 
+        a(href=activity.xourse.path) !{activity.xourse.title}
+    else
+      span.title-activity !{activity.title}
+    div.lds-ring(id="loadingSpinner")
+          div
+          div
+          div
+          div
+
+
+block toc-search
+      if (activity.xourse.activityList.length > 0)
+           div.toc-search
+             input.form-control.xourse-search.nl-text(type="search",placeholder="Zoek in inhoudsopgave...")
+             input.form-control.xourse-search.en-text(type="search",placeholder="Search in table of contents...")
+             button.btn(id="xourse-clear")                                                      
+               i.fa.fa-close                                                                    
+             button.btn(id="xourse-search")
+               i.fa.fa-search                 
+             button.btn(id="xourse-implode")
+               i.fa.fa-toggle-up           
+             button.btn(id="xourse-expand", style="display:none;")                  
+               i.fa.fa-toggle-down
+      else 
+          div.empty
+
+block toc
+      if (activity.xourse.activityList.length > 0)
+        div.toc
+          include activity-list.pug
+          ul                                                                                       
+              for card in activity.xourse.activityToc                                                         
+                +xourseCard(repositoryName, activity.xourse.path, card.href, card, card.href == activity.path)
+          //- for activityUrl in activity.xourse.activityList                                                                                       
+          //-  +xourseCard(repositoryName, activity.xourse.path, activityUrl, activity.xourse.activities[activityUrl], activityUrl == activity.path)
+      else  
+          ul.empty
+
+block activity-title
+  div.activity-title
+    div.activity-title-center
+      if previousActivity
+          span.xmprev.xmhover: a(href=toValidPath("/" + repositoryName + "/" + activity.xourse.path + "/" + previousActivity),aria-label="previous activity")
+            i.fa.fa-chevron-left
+            span.xmhidden &larr; !{previousActivity}
+      span.title !{activity.title}
+      if nextActivity
+          span.xmnext.xmhover: a(href=toValidPath("/" + repositoryName + "/" + activity.xourse.path + "/" + nextActivity))
+            i.fa.fa-chevron-right
+            span.xmhidden &rarr; !{nextActivity}
+//- eigenlijke inhoud
+block activity
+  div.main-activity
         main.activity(id="theActivity", data-hash=activity.hash, data-repository-name=repositoryName, data-commit=activity.commit, data-path=activity.path, data-title=activity.title, role="main", data-learner=learner ? learner._id : undefined, data-xourse-path=activity.xourse ? activity.xourse.path : undefined, data-xourse-url=activity.xourse ? (repositoryName + '/' + activity.xourse.path) : undefined, data-points=activity.xourse ? activity.xourse.totalPoints : undefined)
           .activity-body#page-content
             | !{activity.html}            
+            //- needed here ? next-and-previous is also in navmenu ...
             include page/next-and-previous
+
+block footer
+    div
+          Ximera Technology &copy; 2013&ndash;#{new Date().getFullYear()}<span class="hidden-xs-down">, The Ohio State University &mdash; Ximera Team</span>

@@ -2,7 +2,7 @@ var $ = require('jquery');
 var _ = require('underscore');
 var database = require('./database');
 
-var buttonHtml = '<button class="btn btn-info btn-xs btn-hint-collapse" type="button" aria-expanded="false" aria-controls="collapse"><i class="fa fa-chevron-down"/></button>';
+var buttonHtml = '<button class="btn btn-info btn-xs btn-hint-collapse" type="button" aria-expanded="false" aria-controls="collapse"><i class="fa fa-chevron-down"></i></button>';
 
 var createHint = function() {
     var hint = $(this);
@@ -11,7 +11,8 @@ var createHint = function() {
     hint.collapse('hide');
 
     var button = $(buttonHtml);
-    hint.before(button);
+	hint.wrap('<div></div>')
+	hint.before(button)
 
     button.click( function() {
 	if (hint.persistentData( 'collapsed' )) {
