@@ -1,0 +1,139 @@
+#!/bin/bash
+
+# This .env file is (or might also be) used INSIDE the docker-container, by 'config.js'
+: "${CONFIG_FILE:=.env}"
+
+if [[ -f "$CONFIG_FILE" ]]
+then
+        echo "Loading settings from config file $CONFIG_FILE."
+        . $CONFIG_FILE
+fi
+
+
+if [[ "$1" == "-h" ]]
+then
+   echo "Usage: $0 [-i] production|test|dev|image|list [tag]"
+   exit 0
+fi
+
+if [[ "$1" == "-i" ]]
+then
+    INTERACTIVE="-it --entrypoint /bin/bash"  # start an interactive docker session (i.e. with a terminal attached)
+    shift 
+fi 
+
+if [[ "$1" == "-f" ]]
+then
+    DO_KILL=1  # start an interactive docker session (i.e. with a terminal attached)
+    shift 
+fi 
+
+[[ "$2" != "" ]] && SERVER_VERSION="$2"
+
+
+# Set some defaults
+#
+: "${DOCKER_REPO:=ghcr.io/ximeraproject/}"
+
+
+: "${SERVER_PORT:=2000}"
+: "${SERVER_NAME:=ximeraserver}"
+: "${SERVER_IMAGE:=ximeraserver}"
+: "${SERVER_VERSION:=v2.9}"
+
+: "${SERVER_FULLIMAGE:=${DOCKER_REPO}${SERVER_IMAGE}:${SERVER_VERSION}}"
+
+#
+# Which folder to mount INSIDE the container, under /code  (use with care: it should contain a build.sh !)
+: "${BASEDIR:=$(pwd)}"
+: "${REPODIR:=${BASEDIR}/repositories}"
+: "${DATADIR:=${BASEDIR}/mongodb}"
+: "${GPGDIR:=${BASEDIR}/gpg}"
+#
+
+# Which folder to mount INSIDE the container, under /code  (use with care: it should contain a build.sh !)
+: "${MOUNTDIR:=$BASEDIR}"
+
+: "${TEST_PORT:=2002}"
+: "${TEST_NAME:=tstximserver}"
+: "${TEST_IMAGE:=$SERVER_IMAGE}"
+: "${TEST_VERSION:=$SERVER_VERSION}"
+
+: "${TEST_REPO:=$DOCKER_REPO}"
+: "${TEST_FULLIMAGE:=${TEST_REPO}${TEST_IMAGE}:${TEST_VERSION}}"
+
+: "${DEV_PORT:=2022}"
+: "${DEV_NAME:=devximserver}"
+: "${DEV_IMAGE:=$SERVER_IMAGE}"
+: "${DEV_VERSION:=$SERVER_VERSION}"
+
+
+: "${DEV_REPO:=$DOCKER_REPO}"
+: "${DEV_FULLIMAGE:=${DEV_REPO}${DEV_IMAGE}:${DEV_VERSION}}"
+
+
+: "${BUILD_VERSION:=SERVER_VERSION}"
+
+
+if [[ "$1" == "list" ]]
+then
+    docker inspect --format '{{.State.StartedAt}} Port:{{range .NetworkSettings.Ports}} {{range .}}{{.HostPort}}{{end}}{{end}} {{.Name}} {{.Config.Image}}  Mounts:{{range .Mounts}}{{.Destination}},{{end}}' $(docker ps -q) | column -t | sort
+    exit
+fi
+
+
+do_kill() {
+    CONTAINER=$1
+    CONTAINER_ID=$(docker ps -q -f name=$CONTAINER)
+    if [[ -n "$CONTAINER_ID" ]]
+    then
+        echo "Killing container $CONTAINER $(docker ps -f name=$CONTAINER)"
+        docker kill $CONTAINER_ID
+        sleep 1
+    fi
+}
+
+
+if [[ "$1" == "test" ]]
+then    
+    [[ -n "$DO_KILL" ]] && do_kill "$TEST_NAME" 
+    echo "Starting ximera $TEST_NAME from $TEST_FULLIMAGE on port $TEST_PORT"
+    echo "RUNNING "\
+    docker run --rm $INTERACTIVE --name $TEST_NAME -p $TEST_PORT:2000 $TEST_FULLIMAGE
+    docker run --rm $INTERACTIVE --name $TEST_NAME -p $TEST_PORT:2000 $TEST_FULLIMAGE
+    exit $?
+fi
+
+if [[ "$1" == "dev" ]]
+then    
+    [[ -n "$DO_KILL" ]] && do_kill "$DEV_NAME" 
+
+    echo "Starting ximera $DEV_NAME from $DEV_IMAGE on port $DEV_PORT"
+    echo "RUNNING " \
+    docker run --rm $INTERACTIVE --mount type=bind,source=$MOUNTDIR,target=/usr/var/server  --name $DEV_NAME -p $DEV_PORT:2000 $DEV_FULLIMAGE  
+    docker run --rm $INTERACTIVE --mount type=bind,source=$MOUNTDIR,target=/usr/var/server  --name $DEV_NAME -p $DEV_PORT:2000 $DEV_FULLIMAGE  
+    exit $?
+fi
+if [[ "$1" == "image" ]]
+then    
+    # Use with care: it is assumed the current folder is in a consistent (and documented, ie committed ...) state
+    docker build --tag ${DEV_REPO}${DEV_IMAGE}:${BUILD_VERSION} .
+    exit $?
+fi
+
+if [[ "$1" == "production" ]]
+then
+    [[ -n "$DO_KILL" ]] && do_kill "$SERVER_NAME" 
+    echo "Starting ximera $SERVER_NAME from $SERVER_FULLIMAGE on port $SERVER_PORT"
+    docker run $INTERACTIVE --rm --name $SERVER_NAME -p $SERVER_PORT:2000 \
+        --mount type=bind,source=$REPODIR,target=/usr/var/server/repositories \
+        --mount type=bind,source=$DATADIR,target=/data/db \
+        --mount type=bind,source=$GPGDIR,target=/root/.gpg \
+        $SERVER_FULLIMAGE
+    exit $?
+fi
+
+
+# You should not get here ...
+echo "Usage: $0 [-i] [-f] production|test|dev|image|list [tag]"
+exit 1

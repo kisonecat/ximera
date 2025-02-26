@@ -1,3 +1,21 @@
+
+# node_modules is big, and presumably in/linked from the baseverver image
+node_modules
+
+
+# to be (re-)generated with 'npm run build'
+*.min.js
+*.min.js.map
+
+# folders created/filled while running the ximeraserver
+repositories
+mongodb
+gpg
+
+# generated while running a ximeraserver
+dump.rdb
+
+
 lib-cov
 ecosystem.config.js
 private_key.pem
@@ -17,10 +35,9 @@ results
 
 *~
 
-public/stylesheets/base.css
+# public/stylesheets/base.css
 
 npm-debug.log
-node_modules
 components
 bower_components
 
